@@ -11,11 +11,11 @@ Still, there are some other dependency needed for building the deployment .war. 
 
 # How to Build #
 
-Ant 1.7+ is required to build the deployment .war. Use the syntax of following line to build.
+Ant 1.7+ is required to build the deployment .war. The build process need a proper configuration of j2ee server. Modify the file build.properties and change the j2ee.server.path according to your environment.
 
->ant -Dj2ee_server_path=<path_to_j2ee_server> dist
+    j2ee.server.path=<path_to_j2ee_server>
 
-Here is an example:
+Run the following Ant task to build the .war:
 
-    ant -Dj2ee_server_path=/opt/apache-tomcat-6.0.20 dist
+    ant dist
 

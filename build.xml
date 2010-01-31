@@ -69,9 +69,7 @@
 
     -->
     <target name="-pre-init">
-        <fail unless="j2ee_server_path">
-Define j2ee_server_path, run with {ant -Dj2ee_server_path=&lt;path_to_j2ee_server&gt;}
-        </fail>
+        <property file="build.properties"/>
     </target>
     <target name="-post-compile">
         <copy todir="build/web/WEB-INF/classes/config/">
