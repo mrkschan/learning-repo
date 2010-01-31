@@ -1,0 +1,22 @@
+<%@ page pageEncoding="UTF-8" %>
+<!-- BlueTrip CSS settings -->
+<link rel="stylesheet" href="bluetrip/css/screen.css" type="text/css" media="screen, projection">
+<link rel="stylesheet" href="bluetrip/css/print.css" type="text/css" media="print">
+<!--[if IE]>
+  <link rel="stylesheet" href="bluetrip/css/ie.css" type="text/css" media="screen, projection">
+<![endif]-->
+
+<!-- jQuery settings -->
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.0/jquery.min.js"></script>
+
+<!-- custom -->
+<style type="text/css">
+    a.trigger {
+        color: #D12F19;
+        text-decoration: none;
+    }
+    a.trigger:active, a.trigger:focus {
+        color: #D12F19;
+    }
+</style>
+        

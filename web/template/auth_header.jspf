@@ -1,0 +1,16 @@
+<%@ page pageEncoding="UTF-8" %>
+<%@page import="config.Config" %>
+
+<%
+    Config c = new Config();
+    String auth_svr = c.getConfig("auth_server_url");
+    HttpSession s   = request.getSession(true);
+
+    if (null == s.getAttribute("user")) {
+        response.sendRedirect(auth_svr + 
+            "?s=" + s.getId() +
+            "&referer=" + request.getRequestURL());
+        return;
+    }
+    final String USER = s.getAttribute("user").toString();
+%>

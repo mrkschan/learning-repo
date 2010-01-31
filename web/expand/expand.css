@@ -1,0 +1,56 @@
+.expand {
+  clear:both;
+  margin:0;
+  padding-bottom:.75em;
+}
+
+.expand a:first-letter { text-transform: uppercase; }
+
+.collapse {
+  margin-top:0;
+  margin-bottom:1em;
+  overflow:hidden;
+  border:1px solid #ccc;
+  border-top: 0px;
+  padding: 3px 5px 3px 7px;
+  display:none;
+}
+
+h2 {
+  font-size:1em;
+}
+
+.expand a:link, .expand a:visited {
+  border:1px dotted #ccc;
+  border-width:0 0 1px;
+  text-decoration:none;
+  color:#36c;
+}
+.expand a:hover, .expand a:active, .expand a:focus {
+  border-style:solid;
+  background-color:#f0f0f0;
+  outline:0 none;
+}
+
+.expand a {
+  display:block;
+  padding:3px 10px;
+  word-wrap: break-word;
+}
+.expand a:link, .expand a:visited {
+  border-width:1px;
+  background-image:url(img/arrow-down.gif);
+  background-repeat:no-repeat;
+  background-position:98% 50%;
+}
+.expand a:hover {
+  text-decoration:underline
+}
+.expand.open a:link, .expand.open a:visited {
+  border-style:solid;
+  background:#eee url(img/arrow-up.gif) no-repeat 98% 50%
+}
+
+.expand.open {
+  padding-bottom:0;
+}
