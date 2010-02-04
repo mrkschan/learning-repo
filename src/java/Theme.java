@@ -12,11 +12,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.owasp.esapi.ESAPI;
+import org.owasp.esapi.filters.SafeRequest;
+import org.owasp.esapi.filters.SafeResponse;
 import util.ErrorHandler;
 
 public class Theme extends HttpServlet {
-   
-    /** 
+
+    /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
      * @param request servlet request
      * @param response servlet response
@@ -26,33 +28,34 @@ public class Theme extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
 
-        MongoController m = new MongoController();
-        if (!m.alive()) throw new IOException("mongo connection is dead");
+        ESAPI.httpUtilities().setCurrentHTTP(request, response);
+        SafeRequest req  = ESAPI.httpUtilities().getCurrentRequest();
+        SafeResponse res = ESAPI.httpUtilities().getCurrentResponse();
 
-        if (request.getMethod().equals("GET")) {
+        if (req.getMethod().equals("GET")) {
             // auto-complete
-            String qp = null;
-            try {
-                qp = ESAPI.validator().getValidInput(
-                    "Querying theme", request.getParameter("q"),
-                    "ThemeQuery", Integer.MAX_VALUE, false
-                );
+            String qp = req.getParameter("q");
 
-            } catch (Exception ex) {
-                Logger.getLogger(Theme.class.getName()).log(Level.SEVERE, null, ex);
+            boolean okay = ESAPI.validator().isValidInput(
+                "Querying theme", qp,
+                "ThemeQuery", Integer.MAX_VALUE, false
+            );
+            if (!okay) {
                 ErrorHandler.reportError(response, "Bad theme query");
             }
-            
+
             Pattern p = Pattern.compile(
                 ".*" + qp + ".*", Pattern.CASE_INSENSITIVE
             );
             Map<String, Object> q = new LinkedHashMap();
             q.put("name", p);
 
+            MongoController m = new MongoController();
+            if (!m.alive()) throw new IOException("mongo connection is dead");
             List<Map<String, Object>> themes = m.queryTheme(q);
 
-            response.setContentType("text/plain;charset=UTF-8");
-            PrintWriter out = response.getWriter();
+            res.setContentType("text/plain;charset=UTF-8");
+            PrintWriter out = res.getWriter();
             try {
                 if (null != themes) {
                     for (Map<String, Object> t : themes) {
@@ -63,26 +66,11 @@ public class Theme extends HttpServlet {
                 out.close();
             }
 
-        } else if (request.getMethod().equals("POST")) {
+        } else if (req.getMethod().equals("POST")) {
 
-            String n  = request.getParameter("name"),
-                   k  = request.getParameter("keyword"),
-                   sh = request.getParameter("show_hide");
-
-            boolean okay = true;
-            okay &= ESAPI.validator().isValidSafeHTML(
-                "Saving theme", n, Integer.MAX_VALUE, false
-            );
-            okay &= ESAPI.validator().isValidSafeHTML(
-                "Saving theme", k, Integer.MAX_VALUE, false
-            );
-            okay &= ESAPI.validator().isValidSafeHTML(
-                "Saving theme", sh, 5, false
-            );
-
-            if (!okay) {
-                ErrorHandler.reportError(response, "Invalid theme content");
-            }
+            String n  = req.getParameter("name"),
+                   k  = req.getParameter("keyword"),
+                   sh = req.getParameter("show_hide");
 
             boolean _sh = false;
             try {
@@ -92,17 +80,23 @@ public class Theme extends HttpServlet {
                 ErrorHandler.reportError(response, "Invalid theme content");
             }
 
-            m.saveTheme(n, k.replace(", ", ",").split(","), _sh);
-            response.sendRedirect("admin.jsp" + 
-                                  "?name=" + n + 
-                                  "&keyword=" + k + 
-                                  "&show=" + _sh
+            String keyword[] = null;
+            if (null != k) keyword = k.replace(", ", ",").split(",");
+
+            MongoController m = new MongoController();
+            if (!m.alive()) throw new IOException("mongo connection is dead");
+            m.saveTheme(n, keyword, _sh);
+
+            res.sendRedirect("admin.jsp" +
+                             "?name=" + n +
+                             "&keyword=" + k +
+                             "&show=" + _sh
             );
         }
-    } 
+    }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /** 
+    /**
      * Handles the HTTP <code>GET</code> method.
      * @param request servlet request
      * @param response servlet response
@@ -113,9 +107,9 @@ public class Theme extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
         processRequest(request, response);
-    } 
+    }
 
-    /** 
+    /**
      * Handles the HTTP <code>POST</code> method.
      * @param request servlet request
      * @param response servlet response
@@ -128,7 +122,7 @@ public class Theme extends HttpServlet {
         processRequest(request, response);
     }
 
-    /** 
+    /**
      * Returns a short description of the servlet.
      * @return a String containing servlet description
      */

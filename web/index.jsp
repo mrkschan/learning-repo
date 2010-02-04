@@ -40,7 +40,7 @@
     }
 </script>
             </div>
-            <form id="f" action="submit_object" enctype="multipart/form-data" method="post">
+            <form id="f" action="submit_object" method="post">
                 <fieldset>
                     <legend>Learning Object Submission</legend>
 
@@ -66,7 +66,7 @@
 <%
     MongoController m = new MongoController();
     if (!m.alive()) throw new IOException("mongo connection is dead");
-    
+
     List<Map<String, Object>> dump = m.dumpTheme();
 
     if (null != dump) {
@@ -86,7 +86,7 @@
             keyword = (String[]) _m.get("keyword");
             name    = (String) _m.get("name");
             name    = name.replaceAll(" ", "_");
-            
+
             ary = "[";
             for (int i = 0; i < keyword.length; ++i) {
                 if (0 == i) ary += '"' + keyword[i] + '"';
@@ -98,7 +98,7 @@
     }
 %>
     function refresh_pool() {
-        var _tv = $("#theme").val().replace(' ', '_');
+        var _tv = $("#theme").val().replace(/ /g, '_');
         if (_tv.length > 0) {
             $("#pool").html(_pool[_tv].join(', '));
         }
@@ -106,46 +106,28 @@
 </script>
                     </div>
                     <div>
-                        <label>Title: (less than 100 characters)</label>
+                        <label>One-line Short Summary: (less than 100 characters)</label>
                         <br />
-                        <input type="text" id="title" name="title" size="80" maxlength="100" />
+                        <input type="text" id="summary" name="summary" size="80" maxlength="100" />
                     </div>
                     <div>
-                        <input type="hidden" id="desc_type" name="desc_type" value="txt" />
-                        <label>Description:</label>
-                        (Either
-                        <a href="#" class="trigger" onclick="show_plain()">plain text</a>
-                        or
-                        <a href="#" class="trigger" onclick="show_file()">file upload</a>)
+                        <label>Media Type:</label>
+                        <input type="radio" name="type" value="Article" />
+                        <label>Article</label>
+                        <input type="radio" name="type" value="Video" />
+                        <label>Video</label>
+                        <input type="radio" name="type" value="Audio" />
+                        <label>Audio</label>
+                    </div>
+                    <div>
+                        <label>Content Description:</label>
                         <br />
-                        <div id="desc_txt_c">
-                            <textarea id="desc_txt" name="desc_txt" cols="60" rows="10"></textarea>
-                        </div>
-                        <div id="desc_file_c" style="display: none">
-                            Accepts:
-<%
-    List<String> exts = ESAPI.securityConfiguration().getAllowedFileExtensions();
-    for (int i = 0; i < exts.size(); ++i) {
-        if (i == 0) out.print(exts.get(i));
-        else        out.print(", " + exts.get(i));
-    }
-%>
-                            <br />
-                            <input type="file" id="desc_file" name="desc_file" size="50" />
-                        </div>
-<script type="text/javascript">
-    function show_plain() {
-        $("#desc_txt_c").css('display', 'inline');
-        $("#desc_file_c").css('display', 'none');
-        $("#desc_type").val('txt');
-    }
-
-    function show_file() {
-        $("#desc_txt_c").css('display', 'none');
-        $("#desc_file_c").css('display', 'inline');
-        $("#desc_type").val('file');
-    }
-</script>
+                        <textarea id="desc" name="desc" cols="60" rows="10"></textarea>
+                    </div>
+                    <div>
+                        <label>Explanation of Concepts:</label>
+                        <br />
+                        <textarea id="explain" name="explain" cols="60" rows="10"></textarea>
                     </div>
                     <div>
                         <label for="keyword">Keywords (Comma Separated Value):</label>
@@ -153,7 +135,6 @@
                         [<i>Suggested: <span id="pool"></span></i>]
                         <br />
                         <input type="text" id="keyword" name="keyword" size="70" />
-                        <br />
 <script type="text/javascript">refresh_pool();</script>
                     </div>
                     <div>
@@ -190,20 +171,11 @@
             rules: {
                 sid: {required: true, digits: true, minlength: 8, maxlength: 8},
                 pid: {required: true, digits: true, minlength: 8, maxlength: 8},
-                title: {required: true, maxlength: 100},
+                summary: {required: true, maxlength: 100},
                 keyword: {required: true},
-                desc_txt: {
-                    required: function(el) {
-                        return ( 'txt' == $('#desc_type').val() 
-                              && '' == jQuery.trim($(el).val()));
-                    }
-                },
-                desc_file: {
-                    required: function (el) {
-                        return ( 'file' == $('#desc_type').val() 
-                              && '' == jQuery.trim($(el).val()));
-                    }
-                }
+                desc: {required: true},
+                explain: {required: true},
+                type: {required: true}
             },
             submitHandler: function(form) { form.submit(); }
         });

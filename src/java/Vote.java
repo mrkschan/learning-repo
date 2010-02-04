@@ -7,11 +7,14 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import mongo.MongoController;
+import org.owasp.esapi.ESAPI;
+import org.owasp.esapi.filters.SafeRequest;
+import org.owasp.esapi.filters.SafeResponse;
 import util.ErrorHandler;
 
 public class Vote extends HttpServlet {
-   
-    /** 
+
+    /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
      * @param request servlet request
      * @param response servlet response
@@ -20,15 +23,18 @@ public class Vote extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-        
-        String user   = request.getSession().getAttribute("user").toString();
 
-        String oid    = request.getParameter("oid");
-        Double rating = Double.valueOf(request.getParameter("rating"));
+        ESAPI.httpUtilities().setCurrentHTTP(request, response);
+        SafeRequest  req = ESAPI.httpUtilities().getCurrentRequest();
+        SafeResponse res = ESAPI.httpUtilities().getCurrentResponse();
+
+        String user   = req.getSession().getAttribute("user").toString();
+        String oid    = req.getParameter("oid");
+        Double rating = Double.valueOf(req.getParameter("rating"));
 
         if (-1 == rating.compareTo(0d) || 1 == rating.compareTo(5d)) {
             // less than 0 or larger than 5
-            ErrorHandler.reportError(response, 
+            ErrorHandler.reportError(response,
                 "Vote Rating less than 0 or larger than 5");
         }
 
@@ -83,8 +89,8 @@ public class Vote extends HttpServlet {
 
         m.updateObject(oid, o);
 
-        response.setContentType("application/json;charset=UTF-8");
-        PrintWriter out = response.getWriter();
+        res.setContentType("application/json;charset=UTF-8");
+        PrintWriter out = res.getWriter();
         try {
             out.println(sum / v.length);
         } finally {
@@ -93,7 +99,7 @@ public class Vote extends HttpServlet {
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /** 
+    /**
      * Handles the HTTP <code>GET</code> method.
      * @param request servlet request
      * @param response servlet response
@@ -104,9 +110,9 @@ public class Vote extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
         processRequest(request, response);
-    } 
+    }
 
-    /** 
+    /**
      * Handles the HTTP <code>POST</code> method.
      * @param request servlet request
      * @param response servlet response
@@ -119,7 +125,7 @@ public class Vote extends HttpServlet {
         processRequest(request, response);
     }
 
-    /** 
+    /**
      * Returns a short description of the servlet.
      * @return a String containing servlet description
      */

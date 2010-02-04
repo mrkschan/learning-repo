@@ -54,7 +54,7 @@
         <div class="container">
             <fieldset>
                 <legend>Learning Object Repository</legend>
-                
+
                 <div style="float: right">
                     &gt; Make your submission <a href="index.jsp">Here</a>
                 </div>
@@ -63,6 +63,7 @@
                         <label for="filter">Keyword Filter:</label>
                         <input type="text" id="filter" name="filter" value="" />
                         <a href="#" class="button" style="float: none" onclick="reset_filter()">Reset</a>
+                        <a href="#" class="button" style="float: none" onclick="collapse_all()">Collapse All</a>
                     </p>
 <script type="text/javascript">
     function reset_filter() {
@@ -97,7 +98,7 @@
     Collections.shuffle(lo);
     if (false == lo.isEmpty()) {
         String[] keyword, ref;
-        String _id, k, r, desc_type, desc, rating;
+        String _id, k, r, desc, explain, rating;
         Map<String, Object>[] vote;
 
         for (Map<String, Object> o : lo) {
@@ -124,50 +125,55 @@
             }
 
             r = "";
-            for (String _r : ref) {
-                r += "<li><a href=\"" + _r + "\">" + _r + "</a></li>\n";
+            if (null != ref) {
+                for (String _r : ref) {
+                    r += "<li><a href=\"" + _r + "\">" + _r + "</a></li>\n";
+                }
             }
 
-            desc_type = o.get("desc_type").toString();
-            if (desc_type.equals("file")) {
-                desc = "<p><a href=\"/repo/download?o=" + _id + "\">Download here</a></p>";
-            } else {
-                desc = "<pre>" + o.get("desc").toString() + "</pre>";
-            }
+            desc    = "<pre>" + o.get("desc").toString() + "</pre>";
+            explain = "<pre>" + o.get("explain").toString() + "</pre>";
 %>
 <li>
 
 <h2 class="expand">
-    <% 
-        out.println(o.get("title").toString() + " [<i>Keyword - " + k + "</i>]"); 
+    <%
+        out.println(o.get("summary").toString() + " [<i>Keyword - " + k + "</i>]");
     %>
 </h2>
 
 <div class="collapse">
-    <label>Description:</label>
-        <% out.println(desc); %>
+    <label>Media Type:</label>
+    <span><% out.println(o.get("type").toString()); %></span>
+    <br /><br />
+
+    <label>Content Description:</label>
+    <% out.println(desc); %>
+
+    <label>Explanation of Concept:</label>
+    <% out.println(explain); %>
 
     <label>Reference:</label>
-        <%
-            if (r.length() > 0) {
-        %>
-            <ol class="reference">
-                <% out.println(r); %>
-            </ol>
-        <%
-            } else {
-                out.println("<p>None.</p>");
-            }
-        %>
+    <%
+        if (r.length() > 0) {
+    %>
+        <ol class="reference">
+            <% out.println(r); %>
+        </ol>
+    <%
+        } else {
+            out.println("<p>None.</p>");
+        }
+    %>
 
     <label>Your Rating:</label>
-        <%
-            out.println("<div id=\"vote_" + _id + "\" class=\"rating\"></div>");
-        %>
+    <%
+        out.println("<div id=\"vote_" + _id + "\" class=\"rating\"></div>");
+    %>
 
 <script type="text/javascript">
-    <% 
-        out.println("$('#vote_" + _id + "').rating('vote?oid=" + _id + "', {maxvalue:5, increment:.5" + rating + "});"); 
+    <%
+        out.println("$('#vote_" + _id + "').rating('vote?oid=" + _id + "', {maxvalue:5, increment:.5" + rating + "});");
     %>
 </script>
 </div>
@@ -179,12 +185,22 @@
 %>
                     </ul>
 <script type="text/javascript">
+    var toggler;
     $(document).ready(function() {
         $('#filter').liveUpdate('#listing', function() {
             return $('.expand',this).html().toLowerCase()
         }).focus();
-        $("h2.expand").toggler({method: "toggle", speed: 0});
+        toggler = $('h2.expand').toggler({method: 'toggle', speed: 0});
     });
+
+    function collapse_all() {
+        toggler.each(function() {
+            if ($(this).hasClass('open')) {
+                $(this).removeClass('open')
+                .next('div.collapse').toggle(0);
+            }
+        });
+    }
 </script>
                 </div>
             </fieldset>

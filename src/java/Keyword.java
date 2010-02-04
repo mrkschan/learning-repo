@@ -7,11 +7,14 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.owasp.esapi.ESAPI;
+import org.owasp.esapi.filters.SafeRequest;
+import org.owasp.esapi.filters.SafeResponse;
 import util.ErrorHandler;
 
 public class Keyword extends HttpServlet {
-   
-    /** 
+
+    /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
      * @param request servlet request
      * @param response servlet response
@@ -21,21 +24,24 @@ public class Keyword extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
 
+        ESAPI.httpUtilities().setCurrentHTTP(request, response);
+        SafeRequest req  = ESAPI.httpUtilities().getCurrentRequest();
+        SafeResponse res = ESAPI.httpUtilities().getCurrentResponse();
+
+        Map<String, Object> t, q = new LinkedHashMap();
+        q.put("name", req.getParameter("theme"));
+
         MongoController m = new MongoController();
         if (!m.alive()) throw new IOException("mongo connection is dead");
+        t = m.getTheme(q);
 
-        Map<String, Object> r, q = new LinkedHashMap();
-        q.put("name", request.getParameter("theme"));
-
-        r = m.getTheme(q);
-
-        if (null == r) {
+        if (null == t) {
             ErrorHandler.reportError(response, "Theme not found");
         }
-        String[] keyword = (String[]) r.get("keyword");
+        String[] keyword = (String[]) t.get("keyword");
 
-        response.setContentType("application/json;charset=UTF-8");
-        PrintWriter out = response.getWriter();
+        res.setContentType("application/json;charset=UTF-8");
+        PrintWriter out = res.getWriter();
         try {
             if (null != keyword) {
                 String json = "{\"keyword\":[";
@@ -43,16 +49,18 @@ public class Keyword extends HttpServlet {
                     if (0 == i) json += '"' + keyword[i] + '"';
                     else        json += "," + '"' + keyword[i] + '"';
                 }
-                json += "], \"show\":"+ r.get("show") + "}";
+                json += "], \"show\":"+ t.get("show") + "}";
                 out.println(json);
+            } else {
+                out.println("{\"keyword\":[], \"show\":"+ t.get("show") + "}");
             }
-        } finally { 
+        } finally {
             out.close();
         }
-    } 
+    }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /** 
+    /**
      * Handles the HTTP <code>GET</code> method.
      * @param request servlet request
      * @param response servlet response
@@ -63,9 +71,9 @@ public class Keyword extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
         processRequest(request, response);
-    } 
+    }
 
-    /** 
+    /**
      * Handles the HTTP <code>POST</code> method.
      * @param request servlet request
      * @param response servlet response
@@ -78,7 +86,7 @@ public class Keyword extends HttpServlet {
         processRequest(request, response);
     }
 
-    /** 
+    /**
      * Returns a short description of the servlet.
      * @return a String containing servlet description
      */

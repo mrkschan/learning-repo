@@ -10,7 +10,6 @@ import com.mongodb.Mongo;
 import com.mongodb.ObjectId;
 import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile;
-import com.mongodb.gridfs.GridFSInputFile;
 import config.Config;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -54,9 +53,9 @@ public class MongoController {
 
             themes  = repo.getCollection("theme");
             objects = repo.getCollection("object");
-            
+
             error = false;
-            
+
         } catch (Exception ex) {
             error = true;
 
@@ -87,15 +86,7 @@ public class MongoController {
 
         if (null == o) return null;
 
-        Map<String, Object> t = o.toMap();
-
-        BasicDBList k = (BasicDBList) t.get("keyword");
-        String[] keyword = new String[k.size()];
-        k.toArray(keyword);
-
-        t.put("keyword", keyword);
-
-        return t;
+        return themeToMap(o);
     }
 
     public List<Map<String, Object>> dumpTheme() {
@@ -103,83 +94,58 @@ public class MongoController {
     }
 
     public List<Map<String, Object>> queryTheme(Map<String, Object> theme) {
-        
+
         if (null != theme) {
             String _id = (String) theme.get("_id");
             if (null != _id) theme.put("_id", new ObjectId(_id));
         }
 
         DBCursor c = (null == theme)
-                     ? themes.find() 
+                     ? themes.find()
                      : themes.find(new BasicDBObject(theme));
 
         if (0 == c.count()) return null;
 
         List<Map<String, Object>> l = new LinkedList<Map<String, Object>>();
-        Map<String, Object> hm;
-
-        DBObject o;
-        BasicDBList k;
-        String[] keyword;
 
         while (c.hasNext()) {
-            o = c.next();
-            hm = o.toMap();
-
-            k = (BasicDBList) hm.get("keyword");
-            keyword = new String[k.size()];
-            k.toArray(keyword);
-
-            hm.put("keyword", keyword);
-
-            l.add(hm);
+            l.add(themeToMap(c.next()));
         }
 
         return l;
     }
 
-    public void saveObject(
-        String sid, String pid, String theme, String title, String desc,
-        String[] keyword, String[] ref
-    ) {
-        
-        BasicDBObject o = new BasicDBObject();
+    private Map<String, Object> themeToMap(DBObject o) {
 
-        o.put("sid", sid);
-        o.put("pid", pid);
-        o.put("theme", theme);
-        o.put("title", title);
-        o.put("desc", desc);
-        o.put("desc_type", "txt");
-        o.put("keyword", keyword);
-        o.put("ref", ref);
-        o.put("rating", 0);
+        Map<String, Object> hm = o.toMap();
 
-        objects.insert(o);
+        BasicDBList k = (BasicDBList) hm.get("keyword");
+        String[] keyword = (null == k)? null : new String[k.size()];
+        if (null != keyword) k.toArray(keyword);
+
+        hm.put("keyword", keyword);
+
+        return hm;
     }
 
     public void saveObject(
-        String sid, String pid, String theme, String title,
-        String fname, String ftype, byte[] desc,
+        String sid, String pid, String theme, String type,
+        String summary, String desc, String explain,
         String[] keyword, String[] ref
     ) {
-
-        GridFSInputFile f = gfs.createFile(desc);
-        f.setContentType(ftype);
-        f.setFilename(fname);
-        f.save();
 
         BasicDBObject o = new BasicDBObject();
 
         o.put("sid", sid);
         o.put("pid", pid);
         o.put("theme", theme);
-        o.put("title", title);
-        o.put("desc", f);
-        o.put("desc_type", "file");
+        o.put("type", type);
+        o.put("summary", summary);
+        o.put("desc", desc);
+        o.put("explain", explain);
         o.put("keyword", keyword);
         o.put("ref", ref);
-        o.put("rating", 0f);
+        o.put("rating", 0);
 
         objects.insert(o);
     }
@@ -204,39 +170,13 @@ public class MongoController {
         }
 
         DBCursor c = (null == object)
-                     ? objects.find() 
+                     ? objects.find()
                      : objects.find(new BasicDBObject(object));
         if (0 == c.count()) return null;
 
-        List< Map<String, Object> > l = new LinkedList< Map<String, Object> >();
-        Map<String, Object> hm;
-        DBObject o;
-        String[] keyword, ref;
-        BasicDBList k, r, v;
-        Map<String, Object>[] vote;
+        List<Map<String, Object>> l = new LinkedList<Map<String, Object>>();
         while (c.hasNext()) {
-            o = c.next();
-            hm = o.toMap();
-
-            k = (BasicDBList) hm.get("keyword");
-            keyword = (null == k)? null : new String[k.size()];
-            if (null != keyword) k.toArray(keyword);
-
-            r = (BasicDBList) hm.get("ref");
-            ref = (null == r)? null : new String[r.size()];
-            if (null != ref) r.toArray(ref);
-
-            v = (BasicDBList) hm.get("vote");
-            vote = (null == v)? null : new Map[v.size()];
-            for (int i = 0; null != vote && i < v.size(); ++i) {
-                vote[i] = ((DBObject) v.get(i)).toMap();
-            }
-
-            hm.put("keyword", keyword);
-            hm.put("ref", ref);
-            hm.put("vote", vote);
-
-            l.add(hm);
+            l.add(objToMap(c.next()));
         }
 
         return l;
@@ -251,22 +191,23 @@ public class MongoController {
 
         if (null == o) return null;
 
+        return objToMap(o);
+    }
+
+    private Map<String, Object> objToMap(DBObject o) {
+
         Map<String, Object> hm = o.toMap();
 
-        String[] keyword, ref;
-        BasicDBList k, r, v;
-        Map<String, Object>[] vote;
-
-        k = (BasicDBList) hm.get("keyword");
-        keyword = (null == k)? null : new String[k.size()];
+        BasicDBList k = (BasicDBList) hm.get("keyword");
+        String[] keyword = (null == k)? null : new String[k.size()];
         if (null != keyword) k.toArray(keyword);
 
-        r = (BasicDBList) hm.get("ref");
-        ref = (null == r)? null : new String[r.size()];
+        BasicDBList r = (BasicDBList) hm.get("ref");
+        String[] ref = (null == r)? null : new String[r.size()];
         if (null != ref) r.toArray(ref);
 
-        v = (BasicDBList) hm.get("vote");
-        vote = (null == v)? null : new Map[v.size()];
+        BasicDBList v = (BasicDBList) hm.get("vote");
+        Map[] vote = (null == v)? null : new Map[v.size()];
         for (int i = 0; null != vote && i < v.size(); ++i) {
             vote[i] = ((DBObject) v.get(i)).toMap();
         }
@@ -299,7 +240,7 @@ public class MongoController {
             Logger.getLogger(MongoController.class.getName()).log(Level.SEVERE, null, ex);
             return null;
         }
-        
+
         hm.put("filename", f.getFilename());
         hm.put("contentType", f.getContentType());
         hm.put("data", os.toByteArray());
