@@ -8,8 +8,12 @@
 
     if (null == s.getAttribute("user")) {
         response.sendRedirect(auth_svr + 
-            "?s=" + s.getId() +
-            "&referer=" + request.getRequestURL());
+            "?app_auth=" + request.getContextPath() + "/auth" +
+            "&app_ip=" + request.getLocalAddr() +
+            "&app_port=" + request.getLocalPort() +
+            "&s=" + s.getId() +
+            "&referer=" + request.getRequestURL()
+        );
         return;
     }
     final String USER = s.getAttribute("user").toString();
