@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.owasp.esapi.ESAPI;
 import org.owasp.esapi.filters.SafeRequest;
 import org.owasp.esapi.filters.SafeResponse;
+import util.AuthHandler;
 import util.ErrorHandler;
 
 public class Keyword extends HttpServlet {
@@ -27,6 +28,8 @@ public class Keyword extends HttpServlet {
         ESAPI.httpUtilities().setCurrentHTTP(request, response);
         SafeRequest req  = ESAPI.httpUtilities().getCurrentRequest();
         SafeResponse res = ESAPI.httpUtilities().getCurrentResponse();
+
+        AuthHandler.checkAuth(req, res);
 
         Map<String, Object> t, q = new LinkedHashMap();
         q.put("name", req.getParameter("theme"));

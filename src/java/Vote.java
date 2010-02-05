@@ -10,6 +10,7 @@ import mongo.MongoController;
 import org.owasp.esapi.ESAPI;
 import org.owasp.esapi.filters.SafeRequest;
 import org.owasp.esapi.filters.SafeResponse;
+import util.AuthHandler;
 import util.ErrorHandler;
 
 public class Vote extends HttpServlet {
@@ -27,6 +28,8 @@ public class Vote extends HttpServlet {
         ESAPI.httpUtilities().setCurrentHTTP(request, response);
         SafeRequest  req = ESAPI.httpUtilities().getCurrentRequest();
         SafeResponse res = ESAPI.httpUtilities().getCurrentResponse();
+
+        AuthHandler.checkAuth(req, res);
 
         String user   = req.getSession().getAttribute("user").toString();
         String oid    = req.getParameter("oid");

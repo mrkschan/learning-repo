@@ -1,20 +1,7 @@
 <%@ page pageEncoding="UTF-8" %>
-<%@page import="config.Config" %>
+<%@ page import="util.AuthHandler" %>
 
 <%
-    Config c = new Config();
-    String auth_svr = c.getConfig("auth_server_url");
-    HttpSession s   = request.getSession(true);
-
-    if (null == s.getAttribute("user")) {
-        response.sendRedirect(auth_svr + 
-            "?app_auth=" + request.getContextPath() + "/auth" +
-            "&app_ip=" + request.getLocalAddr() +
-            "&app_port=" + request.getLocalPort() +
-            "&s=" + s.getId() +
-            "&referer=" + request.getRequestURL()
-        );
-        return;
-    }
-    final String USER = s.getAttribute("user").toString();
+    final String USER = AuthHandler.checkAuth(request, response);
+    if (null == USER) return;
 %>

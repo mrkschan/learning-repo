@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.owasp.esapi.ESAPI;
 import org.owasp.esapi.filters.SafeRequest;
 import org.owasp.esapi.filters.SafeResponse;
+import util.AuthHandler;
 import util.ErrorHandler;
 
 public class Theme extends HttpServlet {
@@ -31,6 +32,8 @@ public class Theme extends HttpServlet {
         ESAPI.httpUtilities().setCurrentHTTP(request, response);
         SafeRequest req  = ESAPI.httpUtilities().getCurrentRequest();
         SafeResponse res = ESAPI.httpUtilities().getCurrentResponse();
+
+        AuthHandler.checkAuth(req, res);
 
         if (req.getMethod().equals("GET")) {
             // auto-complete

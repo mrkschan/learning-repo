@@ -1,5 +1,4 @@
 <%@page contentType="text/html" pageEncoding="UTF-8" %>
-<%@page import="config.Config" %>
 <%@page import="mongo.MongoController" %>
 <%@page import="java.util.List" %>
 <%@page import="java.util.Map" %>
@@ -19,8 +18,6 @@
 <!-- jQuery-plugin: validate v1.6 settings -->
 <!-- http://bassistance.de/jquery-plugins/jquery-plugin-validation/ -->
         <script type="text/javascript" src="validate/jquery.validate.js"></script>
-
-        <title><% out.print(new Config().getConfig("repo_title")); %></title>
     </head>
     <body>
         <div class="container">
@@ -88,7 +85,7 @@
             name    = name.replaceAll(" ", "_");
 
             ary = "[";
-            for (int i = 0; i < keyword.length; ++i) {
+            for (int i = 0; null != keyword && i < keyword.length; ++i) {
                 if (0 == i) ary += '"' + keyword[i] + '"';
                 else        ary += "," + '"' + keyword[i] + '"';
             }

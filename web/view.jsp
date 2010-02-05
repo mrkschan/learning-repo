@@ -17,7 +17,6 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <%@include file="template/header.jspf" %>
-        <title><% out.print(new Config().getConfig("repo_title")); %></title>
 
 <!-- jQuery-plugin: livesearch settings -->
 <!-- http://ejohn.org/blog/jquery-livesearch/ -->

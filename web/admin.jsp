@@ -1,7 +1,9 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@include file="template/auth_header.jspf" %>
+<%@ page import="config.Config" %>
+
 <%
-    String admin = c.getConfig("admin");
+    String admin = new Config().getConfig("admin");
     if (false == admin.contains(USER)) response.sendRedirect("evil.html");
 %>
 
@@ -18,8 +20,6 @@
         <link rel="stylesheet" href="autocomplete/jquery.autocomplete.css" type="text/css" />
         <script type="text/javascript" src="autocomplete/lib/jquery.bgiframe.min.js"></script>
         <script type="text/javascript" src="autocomplete/jquery.autocomplete.js"></script>
-
-        <title><% out.print(new Config().getConfig("repo_title")); %></title>
     </head>
     <body>
         <div class="container">
