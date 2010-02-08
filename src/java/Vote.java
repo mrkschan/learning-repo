@@ -25,13 +25,14 @@ public class Vote extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
 
+        final String USER = AuthHandler.checkAuth(request, response);
+        if (null == USER) return;
+
         ESAPI.httpUtilities().setCurrentHTTP(request, response);
         SafeRequest  req = ESAPI.httpUtilities().getCurrentRequest();
         SafeResponse res = ESAPI.httpUtilities().getCurrentResponse();
 
-        AuthHandler.checkAuth(req, res);
-
-        String user   = req.getSession().getAttribute("user").toString();
+        String user   = USER;
         String oid    = req.getParameter("oid");
         Double rating = Double.valueOf(req.getParameter("rating"));
 

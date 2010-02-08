@@ -14,8 +14,7 @@ public class AuthHandler {
         HttpSession s = request.getSession(true);
 
         if (null == s.getAttribute("user")) {
-            Config c = new Config();
-            String auth_svr = c.getConfig("auth_server_url");
+            String auth_svr = new Config().getConfig("auth_server_url");
 
             response.sendRedirect(auth_svr +
                 "?app_auth=" + request.getContextPath() + "/auth" +

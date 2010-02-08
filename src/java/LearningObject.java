@@ -27,11 +27,12 @@ public class LearningObject extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
 
+        final String USER = AuthHandler.checkAuth(request, response);
+        if (null == USER) return;
+
         ESAPI.httpUtilities().setCurrentHTTP(request, response);
         SafeRequest req  = ESAPI.httpUtilities().getCurrentRequest();
         SafeResponse res = ESAPI.httpUtilities().getCurrentResponse();
-
-        AuthHandler.checkAuth(req, res);
         
         Map pm = req.getParameterMap();        
         String sid      = req.getParameter("sid"),
