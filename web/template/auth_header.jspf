@@ -1,7 +1,14 @@
 <%@ page pageEncoding="UTF-8" %>
 <%@ page import="util.AuthHandler" %>
+<%@ page import="org.owasp.esapi.ESAPI" %>
+<%@ page import="org.owasp.esapi.filters.SafeRequest" %>
+<%@ page import="org.owasp.esapi.filters.SafeResponse" %>
 
 <%
+    ESAPI.httpUtilities().setCurrentHTTP(request, response);
+    SafeRequest req  = ESAPI.httpUtilities().getCurrentRequest();
+    SafeResponse res = ESAPI.httpUtilities().getCurrentResponse();
+
     final String USER = AuthHandler.checkAuth(request, response);
     if (null == USER) return;
 %>

@@ -90,6 +90,8 @@ public class Theme extends HttpServlet {
             if (!m.alive()) throw new IOException("mongo connection is dead");
             m.saveTheme(n, keyword, _sh);
 
+            if (null == k) k = "";
+
             res.sendRedirect("admin.jsp" +
                              "?name=" + n +
                              "&keyword=" + k +
