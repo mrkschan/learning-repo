@@ -349,3 +349,11 @@ a.positive:active, button.positive:active { background-color:#529214; border:1px
 body .negative { color:#d12f19; }
 a.negative:hover, button.negative:hover { background:#fbe3e4; border:1px solid #fbc2c4; color:#d12f19; }
 a.negative:active, button.negative:active { background-color:#d12f19; border:1px solid #d12f19; color:#fff; }
+
+pre {
+ white-space: pre-wrap;       /* css-3 */
+ white-space: -moz-pre-wrap !important;  /* Mozilla, since 1999 */
+ white-space: -pre-wrap;      /* Opera 4-6 */
+ white-space: -o-pre-wrap;    /* Opera 7 */
+ word-wrap: break-word;       /* Internet Explorer 5.5+ */
+}
