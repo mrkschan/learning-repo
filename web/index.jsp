@@ -111,6 +111,8 @@
                         <label>Media Type:</label>
                         <input type="radio" name="type" value="Article" />
                         <label>Article</label>
+                        <input type="radio" name="type" value="Slide" />
+                        <label>Slide</label>
                         <input type="radio" name="type" value="Video" />
                         <label>Video</label>
                         <input type="radio" name="type" value="Audio" />
