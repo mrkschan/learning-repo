@@ -89,10 +89,7 @@ public class LearningObject extends HttpServlet {
                 "Learning Object Submission",
                 type, "MediaType", 8, false
             );
-            okay &= ESAPI.validator().isValidSafeHTML(
-                "Learning Object Submission",
-                summary, 100, false
-            );
+            okay &= (summary.length() <= 100);
 
             if (null != ref) {
                 for (String _r : ref) {
