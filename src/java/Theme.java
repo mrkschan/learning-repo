@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.owasp.esapi.ESAPI;
+import org.owasp.esapi.Encoder;
 import org.owasp.esapi.filters.SafeRequest;
 import org.owasp.esapi.filters.SafeResponse;
 import util.AuthHandler;
@@ -36,9 +37,12 @@ public class Theme extends HttpServlet {
         SafeRequest req  = ESAPI.httpUtilities().getCurrentRequest();
         SafeResponse res = ESAPI.httpUtilities().getCurrentResponse();
 
+        req.setCharacterEncoding("UTF-8");
+        Encoder e = ESAPI.encoder();
+
         if (req.getMethod().equals("GET")) {
             // auto-complete
-            String qp = req.getParameter("q");
+            String qp = e.encodeForHTML(req.getParameter("q"));
 
             boolean okay = ESAPI.validator().isValidInput(
                 "Querying theme", qp,
@@ -72,8 +76,8 @@ public class Theme extends HttpServlet {
 
         } else if (req.getMethod().equals("POST")) {
 
-            String n  = req.getParameter("name"),
-                   k  = req.getParameter("keyword"),
+            String n  = e.encodeForHTML(req.getParameter("name")),
+                   k  = e.encodeForHTML(req.getParameter("keyword")),
                    sh = req.getParameter("show_hide");
 
             boolean _sh = false;

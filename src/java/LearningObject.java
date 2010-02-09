@@ -4,12 +4,15 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import mongo.MongoController;
 import org.owasp.esapi.ESAPI;
+import org.owasp.esapi.Encoder;
 import org.owasp.esapi.filters.SafeRequest;
 import org.owasp.esapi.filters.SafeResponse;
 import util.AuthHandler;
@@ -33,19 +36,22 @@ public class LearningObject extends HttpServlet {
         ESAPI.httpUtilities().setCurrentHTTP(request, response);
         SafeRequest req  = ESAPI.httpUtilities().getCurrentRequest();
         SafeResponse res = ESAPI.httpUtilities().getCurrentResponse();
-        
-        Map pm = req.getParameterMap();        
+
+        req.setCharacterEncoding("UTF-8");
+        Encoder e = ESAPI.encoder();
+
+        Map pm = req.getParameterMap();
         String sid      = req.getParameter("sid"),
                pid      = req.getParameter("pid"),
                theme    = req.getParameter("theme"),
                type     = req.getParameter("type"),
-               summary  = req.getParameter("summary"),
-               desc     = req.getParameter("desc"),
-               explain  = req.getParameter("explain"),
-               _keyword = req.getParameter("keyword"),
+               summary  = e.encodeForHTML(req.getParameter("summary")),
+               desc     = e.encodeForHTML(req.getParameter("desc")),
+               explain  = e.encodeForHTML(req.getParameter("explain")),
+               _keyword = e.encodeForHTML(req.getParameter("keyword")),
                ref[]    = (String[]) pm.get("ref");
 
-        {
+        try {
             // filter empty ref
             List<String> _ref = new LinkedList<String>();
             List<String> l = Arrays.asList(ref);
@@ -59,6 +65,9 @@ public class LearningObject extends HttpServlet {
             } else {
                 ref = null;
             }
+        } catch (Exception ex) {
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
+            ErrorHandler.reportError(response, "Invalid learning object content");
         }
 
         MongoController m = new MongoController();
@@ -84,18 +93,7 @@ public class LearningObject extends HttpServlet {
                 "Learning Object Submission",
                 summary, 100, false
             );
-            okay &= ESAPI.validator().isValidSafeHTML(
-                "Learning Object Submission",
-                desc, Integer.MAX_VALUE, false
-            );
-            okay &= ESAPI.validator().isValidSafeHTML(
-                "Learning Object Submission",
-                explain, Integer.MAX_VALUE, false
-            );
-            okay &= ESAPI.validator().isValidSafeHTML(
-                "Learning Object Submission",
-                _keyword, Integer.MAX_VALUE, false
-            );
+
             if (null != ref) {
                 for (String _r : ref) {
                     okay &= ESAPI.validator().isValidInput(
