@@ -131,7 +131,7 @@ public class MongoController {
     public void saveObject(
         String sid, String pid, String theme, String type,
         String summary, String desc, String explain,
-        String[] keyword, String[] ref
+        String[] keyword, String[] ref, String submit_by
     ) {
 
         BasicDBObject o = new BasicDBObject();
@@ -146,6 +146,7 @@ public class MongoController {
         o.put("keyword", keyword);
         o.put("ref", ref);
         o.put("rating", 0);
+        o.put("submit", submit_by);
 
         objects.insert(o);
     }

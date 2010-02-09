@@ -114,7 +114,7 @@ public class LearningObject extends HttpServlet {
 
         String keyword[] = _keyword.replace(", ",",").split(",");
         m.saveObject(
-            sid, pid, theme, type, summary, desc, explain, keyword, ref
+            sid, pid, theme, type, summary, desc, explain, keyword, ref, USER
         );
 
         res.sendRedirect("?sid=" + sid + "&pid=" + pid);
