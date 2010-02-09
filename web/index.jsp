@@ -117,6 +117,8 @@
                         <label>Video</label>
                         <input type="radio" name="type" value="Audio" />
                         <label>Audio</label>
+                        <input type="radio" name="type" value="Other" />
+                        <label>Other</label>
                     </div>
                     <div>
                         <label>Content Description:</label>
