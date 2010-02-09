@@ -1,0 +1,2 @@
+when ESAPI.properties is not found in getResourceFile routine, search in local classpath.
+see line 668.
