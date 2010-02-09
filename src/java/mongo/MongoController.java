@@ -13,6 +13,7 @@ import com.mongodb.gridfs.GridFSDBFile;
 import config.Config;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -147,6 +148,7 @@ public class MongoController {
         o.put("ref", ref);
         o.put("rating", 0);
         o.put("submit", submit_by);
+        o.put("create", new Date());
 
         objects.insert(o);
     }
