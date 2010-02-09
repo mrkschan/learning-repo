@@ -68,6 +68,7 @@ public class LearningObject extends HttpServlet {
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
             ErrorHandler.reportError(response, "Invalid learning object content");
+            return;
         }
 
         MongoController m = new MongoController();
