@@ -1,0 +1,51 @@
+<head>
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.0/jquery.min.js"></script>
+<link rel="stylesheet" type="text/css" href="http://bluetrip.org/sites/bluetrip.org/themes/starkish/demo/css/screen.css" />
+
+<script type="text/javascript" src="jquery.timesink.js"></script>
+<link rel="stylesheet" href="timesink.css" type="text/css" />
+
+<script type="text/javascript">
+var ts;
+$(document).ready(function() {
+	var anchor  = new Date('December 25, 1975');
+//	var anchor  = new Date();
+	var quarter = new Date(anchor); quarter.setMonth(anchor.getMonth() - 4);
+	var year    = new Date(anchor); year.setFullYear(anchor.getFullYear() - 1);
+
+	ts = $('#filter').timeSink(
+		'#listing',
+		// specify the time range; corresponding to order of filter.li
+		[null, quarter, year],
+		// mapper function to locate timestamp
+		function () {
+			return new Date($(this).html()); // li.innerHTML
+		}
+	);
+});
+</script>
+
+</head>
+
+<body>
+<div class="container">
+Anchor = 'December 25, 1975';
+
+<ul id="filter" class="ts_filter">
+	<li>[+] Show All</li>
+	<li>[+] Within a Quarter</li>
+	<li>[+] Within a Year</li>
+</ul>
+
+<ul id="listing">
+	<li>October 13, 1975 11:13:00</li>
+	<li>October 13, 1975</li>
+	<li>Aug 30, 1975</li>
+	<li>Feb 13, 1975</li>
+	<li>July 13, 1973</li>
+</ul>
+
+using <a href="http://bluetrip.org/" style="background:none; padding:0; margin:0;">bluetrip css framework</a>.
+</div>
+</body>

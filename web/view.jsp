@@ -33,6 +33,11 @@
         <script type="text/javascript" src="rating/jquery.rating.js"></script>
         <link rel="stylesheet" href="rating/rating.css" type="text/css" />
 
+<!--jQuery-plugin: timesink settings -->
+<!-- http://github.com/mrkschan/jquery-timesink-plugin -->
+        <script type="text/javascript" src="timesink/jquery.timesink.js"></script>
+        <link rel="stylesheet" href="timesink/timesink.css" type="text/css" />
+
 <!-- Custom settings -->
     <style type="text/css">
         #listing {
@@ -47,6 +52,21 @@
         pre {
             color: #000000;
         }
+
+        .ts_filter {
+            margin-top: 0px;
+            margin-left: 0px;
+            margin-bottom: 0px;
+            padding-left: 0px;
+        }
+
+        .ts_filter li {
+            float: left;
+        }
+
+        .ts_filter :first-child {
+            margin-left: 0px;
+        }
     </style>
     </head>
     <body>
@@ -58,12 +78,16 @@
                     &gt; Make your submission <a href="index.jsp">Here</a>
                 </div>
                 <div style="float: none">
-                    <p>
+                    <p style="margin-bottom: 0px;">
                         <label for="filter">Keyword Filter:</label>
                         <input type="text" id="filter" name="filter" value="" />
                         <a href="#" class="button" style="float: none" onclick="reset_filter()">Reset</a>
                         <a href="#" class="button" style="float: none" onclick="collapse_all()">Collapse All</a>
                     </p>
+                    <ul id="timesink" class="ts_filter">
+                        <li>&gt; Show item within a Quarter</li>
+                        <li>&gt; Show item within a Year</li>
+                    </ul>
 <script type="text/javascript">
     function reset_filter() {
         $('#filter').val('');
@@ -76,6 +100,8 @@
 <%
     MongoController m = new MongoController();
     if (!m.alive()) throw new IOException("mongo connection is dead");
+
+    SimpleDateFormat df = new SimpleDateFormat("MMM d, yyyy");
 
     Map<String, Object> qo, qt = new LinkedHashMap();
     qt.put("show", true);
@@ -169,6 +195,9 @@
     <%
         out.println("<div id=\"vote_" + _id + "\" class=\"rating\"></div>");
     %>
+    <div style="float: right">
+        - <span class="timestamp"><% out.print(df.format(o.get("submit"))); %></span>
+    </div>
 
 <script type="text/javascript">
     <%
@@ -184,12 +213,45 @@
 %>
                     </ul>
 <script type="text/javascript">
-    var toggler;
+    var toggler, liveupdate, timesink;
     $(document).ready(function() {
-        $('#filter').liveUpdate('#listing', function() {
+
+        // keyword filter
+        liveupdate = $('#filter').liveUpdate('#listing', function() {
             return $('.expand',this).html().toLowerCase()
-        }).focus();
+        });
+        liveupdate.focus();
+
+        // expand toggler
         toggler = $('h2.expand').toggler({method: 'toggle', speed: 0});
+
+        // time range filter
+	var anchor  = new Date();
+	var quarter = new Date(anchor); quarter.setMonth(anchor.getMonth() - 4);
+	var year    = new Date(anchor); year.setFullYear(anchor.getFullYear() - 1);
+
+	timesink = $('#timesink').timeSink(
+            '#listing',
+            [quarter, year],
+            function () {
+                return new Date($('.timestamp',this).html());
+            }
+	);
+
+        $('#listing').bind('liveupdate-show', function(evt, el) {
+            if (null != timesink.sieve) {
+                if (new Date($('.timestamp', el).html()) < timesink.sieve) {
+                    $(el).hide();
+                }
+            }
+        });
+        $('#listing').bind('timesink-show', function(evt, el) {
+            var term = $.trim( $('#filter').val().toLowerCase() );
+            var line = $('.expand a',el).html().toLowerCase();
+            if (line.score(term) == 0) {
+                $(el).hide();
+            }
+        });
     });
 
     function collapse_all() {

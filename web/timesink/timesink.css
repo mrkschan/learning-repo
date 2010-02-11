@@ -1,0 +1,13 @@
+.ts_filter {
+	list-style-type: none;
+}
+
+.ts_filter li {
+	padding-bottom: 5px;
+	text-decoration: none;
+	cursor: pointer;
+}
+
+.ts_filter li:hover {
+	text-decoration: underline;
+}
