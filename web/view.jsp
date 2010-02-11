@@ -197,7 +197,7 @@
         out.println("<div id=\"vote_" + _id + "\" class=\"rating\"></div>");
     %>
     <div style="float: right">
-        - <span class="timestamp"><% out.print(df.format(o.get("submit"))); %></span>
+        - <span class="timestamp"><% out.print(df.format(o.get("create"))); %></span>
     </div>
 
 <script type="text/javascript">
