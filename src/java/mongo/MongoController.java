@@ -8,13 +8,8 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.Mongo;
 import com.mongodb.ObjectId;
-import com.mongodb.gridfs.GridFS;
-import com.mongodb.gridfs.GridFSDBFile;
 import config.Config;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +22,7 @@ public class MongoController {
 
     private Mongo m;
     private DB repo;
-    private GridFS gfs;
+//    private GridFS gfs;
     private DBCollection themes;
     private DBCollection objects;
 
@@ -50,7 +45,7 @@ public class MongoController {
             if (false == repo.authenticate(usr, pwd.toCharArray())) {
                 throw new Exception("invalid mongo credential");
             }
-            gfs = new GridFS(repo);
+//            gfs = new GridFS(repo);
 
             themes  = repo.getCollection("theme");
             objects = repo.getCollection("object");
@@ -221,7 +216,7 @@ public class MongoController {
 
         return hm;
     }
-
+/*
     public Map<String, Object> getFile(Map<String, Object> object) {
 
         String _id = (String) object.get("_id");
@@ -250,4 +245,5 @@ public class MongoController {
 
         return hm;
     }
+ */
 }
