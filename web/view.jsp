@@ -92,6 +92,7 @@
     function reset_filter() {
         $('#filter').val('');
         $('#listing').children('li').show();
+        timesink.sieve = null;
     }
 </script>
                 </div>
