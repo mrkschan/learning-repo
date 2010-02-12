@@ -273,7 +273,7 @@ a[href$=".xls"]   { background-image: url(../img/icons/xls.png); }
 a[href$=".rss"], 
 a[href$=".rdf"]   { background-image: url(../img/icons/feed.png); }
 a[href^="aim:"]   { background-image: url(../img/icons/im.png); }
-a[href^="http://144.214.37.11:8080"] { background:none; padding:0; margin:0; }
+a[href^="http://"] { background:none; padding:0; margin:0; }
 
 /* TEXT CLASSES */
 

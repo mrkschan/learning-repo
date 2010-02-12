@@ -62,6 +62,7 @@
 
         .ts_filter li {
             float: left;
+            padding-right: 5px;
         }
 
         .ts_filter :first-child {
@@ -201,9 +202,12 @@
     </div>
 
 <script type="text/javascript">
-    <%
-        out.println("$('#vote_" + _id + "').rating('vote?oid=" + _id + "', {maxvalue:5, increment:.5" + rating + "});");
-    %>
+    $(document).ready(function() {
+        $('#vote_<% out.print(_id); %>').rating(
+            'vote?oid=<% out.print(_id); %>',
+            {maxvalue:5, increment:.5<% out.print(rating); %>}
+        );
+    });
 </script>
 </div>
 
@@ -258,8 +262,7 @@
     function collapse_all() {
         toggler.each(function() {
             if ($(this).hasClass('open')) {
-                $(this).removeClass('open')
-                .next('div.collapse').toggle(0);
+                $(this).removeClass('open').next('div.collapse').hide();
             }
         });
     }
