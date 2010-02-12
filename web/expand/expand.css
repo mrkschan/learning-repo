@@ -34,7 +34,7 @@ h2 {
 
 .expand a {
   display:block;
-  padding:3px 50px;
+  padding:3px 50px 3px 10px;
   word-wrap: break-word;
 }
 .expand a:link, .expand a:visited {
