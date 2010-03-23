@@ -125,13 +125,13 @@
     Collections.sort(lo, new Comparator<Map>() {
         public int compare(Map a, Map b) {
             // sort (DESC) by view * avg
-            // avg  = [1, 6] view = [2, inf]
+            // avg  = [1, 6] view = [1, inf]
 
             Map views_a = (Map) a.get("views");
             Map views_b = (Map) b.get("views");
 
-            int va = (null != views_a)? views_a.size() : 2,
-                vb = (null != views_b)? views_b.size() : 2;
+            int va = (null != views_a)? views_a.size() + 1 : 1,
+                vb = (null != views_b)? views_b.size() + 1 : 1;
 
             Double ra = Double.valueOf(a.get("rating").toString()),
                    rb = Double.valueOf(b.get("rating").toString());
