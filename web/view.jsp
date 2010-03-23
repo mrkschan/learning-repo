@@ -124,11 +124,21 @@
 
     Collections.sort(lo, new Comparator<Map>() {
         public int compare(Map a, Map b) {
-            Double rating_a = Double.valueOf(a.get("rating").toString()),
-                   rating_b = Double.valueOf(b.get("rating").toString());
+            // sort by view count * avg rating (DESC)
+            Map views_a = (Map) a.get("views");
+            Map views_b = (Map) b.get("views");
 
-            if (null != rating_a && null != rating_b)
-                return -1 * rating_a.compareTo(rating_b); // sort decending
+            int va = (null != views_a)? views_a.size() : 1,
+                vb = (null != views_b)? views_b.size() : 1;
+
+            Double ra = Double.valueOf(a.get("rating").toString()),
+                   rb = Double.valueOf(b.get("rating").toString());
+
+            double _a = va * (ra + 1),
+                   _b = vb * (rb + 1);
+
+            if (_a > _b) return -1;
+            if (_a < _b) return 1;
             return 0;
         }
     });
@@ -204,6 +214,8 @@
     <%
         out.println("<div id=\"vote_" + _id + "\" class=\"rating\"></div>");
     %>
+<!--  avg: <% out.print(average); %> -->
+<!-- view: <% Map _views = (Map) o.get("views"); if (null != _views) out.print(_views.size()); %> -->
 
     <div style="float: right">
         - <span class="timestamp"><% out.print(df.format(o.get("create"))); %></span>
