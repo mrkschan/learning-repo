@@ -58,7 +58,9 @@ $.fn.toggler = function(options) {
          method : 'slideToggle',
          speed : 'slow',
          container : '', //the common container of all groups with collapsible content (optional)
-         initShow : '.shown' //the initially expanded sections (optional)
+         initShow : '.shown', //the initially expanded sections (optional)
+         expandCallback : null,  // expand callback function   (optional)
+         collapseCallback : null // collapse callback function (optional)
     };
     var o = $.extend({}, defaults, options);
     
@@ -72,6 +74,11 @@ $.fn.toggler = function(options) {
       $(this).click(function() {
           $(this).toggleClass('open')
           .next(o.cllpsEl)[o.method](o.speed);
+
+          // toggle callback
+          if (o.expandCallback && $(this).hasClass('open')) o.expandCallback(this);
+          else if (o.collapseCallback) o.collapseCallback(this);
+
           return false;
     });
 });};
