@@ -128,7 +128,7 @@
                    rating_b = Double.valueOf(b.get("rating").toString());
 
             if (null != rating_a && null != rating_b)
-                return -1 * rating_a.compareTo(rating_b);
+                return -1 * rating_a.compareTo(rating_b); // sort decending
             return 0;
         }
     });
@@ -170,7 +170,7 @@
 %>
 <li>
 
-<h2 class="expand">
+<h2 class="expand" id="head_<% out.print(_id); %>">
     <%
         out.println(o.get("summary").toString() + " [<i>Keyword - " + k + "</i>]");
     %>
@@ -236,7 +236,13 @@
         liveupdate.focus();
 
         // expand toggler
-        toggler = $('h2.expand').toggler({method: 'toggle', speed: 0});
+        toggler = $('h2.expand').toggler({
+            method: 'toggle', speed: 0,
+            expandCallback: function(o) {
+                var oid = o.id.replace('head_','');
+                $.ajax({ url: 'evaluate?action=view&oid=' + oid});
+            }
+        });
 
         // time range filter
 	var anchor  = new Date();

@@ -84,6 +84,27 @@ public class Evaluation extends HttpServlet {
 
     void view(HttpServletRequest req, HttpServletResponse res, String user)
     throws ServletException, IOException {
+
+        String oid = req.getParameter("oid");
+
+        MongoController m = new MongoController();
+
+        Map<String, Object> q = new LinkedHashMap();
+        q.put("_id", oid);
+
+        Map<String, Object> o = m.getObject(q);
+        if (null == o) ErrorHandler.reportError(res, "Learning Object not found");
+
+
+        // object.views
+        Map<String, Boolean> views = (Map) o.get("views");
+
+        if (null == views) views = new LinkedHashMap<String, Boolean>();
+        views.put(user, true);
+
+        o.put("views", views);
+
+        m.updateObject(oid, o);
     }
 
     void annotate(HttpServletRequest req, HttpServletResponse res, String user)
