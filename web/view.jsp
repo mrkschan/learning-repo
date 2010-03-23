@@ -87,6 +87,12 @@
         }
 
         h2 { margin-top: 2px; }
+        table, td { 
+            border-top: 0px;
+            border-left: 0px;
+            border-bottom: 0px;
+            border-right: 0px;
+        }
     </style>
     </head>
     <body>
@@ -114,16 +120,26 @@
                     &gt; Make your submission <a href="index.jsp">Here</a>
                 </div>
                 <div style="float: none">
-                    <p style="margin-bottom: 0px;">
-                        <label for="filter">Keyword Filter:</label>
-                        <input type="text" id="filter" name="filter" value="" />
-                        <a href="#" class="button" style="float: none" onclick="reset_filter()">Reset</a>
-                        <a href="#" class="button" style="float: none" onclick="collapse_all()">Collapse All</a>
-                    </p>
-                    <ul id="timesink" class="ts_filter">
-                        <li>&gt; Show item within a Quarter</li>
-                        <li>&gt; Show item within a Year</li>
-                    </ul>
+                <table>
+                    <tr>
+                        <td>
+                            <label for="filter">Keyword Filter:</label>
+                            <input type="text" id="filter" name="filter" value="" />
+                        </td>
+                        <td>
+                            <a href="#" class="button" style="float: none" onclick="reset_filter()">Reset</a>
+                            <a href="#" class="button" style="float: none" onclick="collapse_all()">Collapse All</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <ul id="timesink" class="ts_filter">
+                                <li>&gt; Show item within a Quarter</li>
+                                <li>&gt; Show item within a Year</li>
+                            </ul>
+                        </td>
+                    </tr>
+                </table>
 <script type="text/javascript">
     function reset_filter() {
         $('#filter').val('');
@@ -218,7 +234,7 @@
 
 <div class="expand" id="head_<% out.print(_id); %>">
     <h2 class="bigcap"><% out.println(o.get("summary").toString()); %></h2>
-    &gt; <i class="bigcap"><% out.print(k); %></i>
+    <i>&gt; <% out.print(k); %></i>
 </div>
 
 <div class="collapse">
