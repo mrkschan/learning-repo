@@ -69,9 +69,43 @@
         .ts_filter :first-child {
             margin-left: 0px;
         }
+
+        #toTop {
+            width:100px;
+            border:1px solid #ccc;
+            background:#f7f7f7;
+            text-align:center;
+            padding:5px;
+            position:fixed; /* this is the magic */
+            top:10px; /* together with this to put the div at the bottom*/
+            left:10px;
+            cursor:pointer;
+            display:none;
+            color:#333;
+            font-family:verdana;
+            font-size:11px;
+        }
+
+        h2 { margin-top: 2px; }
     </style>
     </head>
     <body>
+<!-- back-to-top tricks http://agyuku.net/2009/05/back-to-top-link-using-jquery/ -->
+        <div id="toTop">^ Back to Top</div>
+        <script type="text/javascript">
+            $(document).ready(function() {
+                $(window).scroll(function () {
+                    if ($(this).scrollTop() != 0) {
+                        $('#toTop').fadeIn();
+                    } else {
+                        $('#toTop').fadeOut();
+                    }
+                });
+                $('#toTop').click(function () {
+                    $('body,html').scrollTop(0);
+                });
+            });
+        </script>
         <div class="container">
             <fieldset>
                 <legend>Learning Object Repository</legend>
@@ -182,11 +216,10 @@
 %>
 <li>
 
-<h2 class="expand" id="head_<% out.print(_id); %>">
-    <%
-        out.println(o.get("summary").toString() + " [<i>Keyword - " + k + "</i>]");
-    %>
-</h2>
+<div class="expand" id="head_<% out.print(_id); %>">
+    <h2 class="bigcap"><% out.println(o.get("summary").toString()); %></h2>
+    &gt; <i class="bigcap"><% out.print(k); %></i>
+</div>
 
 <div class="collapse">
     <label>Media Type:</label>
@@ -250,7 +283,7 @@
         liveupdate.focus();
 
         // expand toggler
-        toggler = $('h2.expand').toggler({
+        toggler = $('div.expand').toggler({
             method: 'toggle', speed: 0,
             expandCallback: function(o) {
                 var oid = o.id.replace('head_','');

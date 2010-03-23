@@ -4,7 +4,7 @@
   padding-bottom:.75em;
 }
 
-.expand a:first-letter { text-transform: uppercase; }
+.expand .bigcap:first-letter { text-transform: uppercase; }
 
 .collapse {
   margin-top:0;
