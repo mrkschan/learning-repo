@@ -59,7 +59,6 @@ public class Theme extends HttpServlet {
             q.put("name", p);
 
             MongoController m = new MongoController();
-            if (!m.alive()) throw new IOException("mongo connection is dead");
             List<Map<String, Object>> themes = m.queryTheme(q);
 
             res.setContentType("text/plain;charset=UTF-8");
@@ -92,7 +91,6 @@ public class Theme extends HttpServlet {
             if (null != k) keyword = k.replace(", ", ",").split(",");
 
             MongoController m = new MongoController();
-            if (!m.alive()) throw new IOException("mongo connection is dead");
             m.saveTheme(n, keyword, _sh);
 
             if (null == k) k = "";

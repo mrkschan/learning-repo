@@ -36,7 +36,6 @@ public class Keyword extends HttpServlet {
         q.put("name", req.getParameter("theme"));
 
         MongoController m = new MongoController();
-        if (!m.alive()) throw new IOException("mongo connection is dead");
         t = m.getTheme(q);
 
         if (null == t) {

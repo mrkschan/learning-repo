@@ -62,7 +62,6 @@
                         <select id="theme" name="theme" onchange="refresh_pool()">
 <%
     MongoController m = new MongoController();
-    if (!m.alive()) throw new IOException("mongo connection is dead");
 
     List<Map<String, Object>> dump = m.dumpTheme();
 

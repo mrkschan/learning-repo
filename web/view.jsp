@@ -9,6 +9,7 @@
 <%@page import="java.util.LinkedList" %>
 <%@page import="java.util.Calendar" %>
 <%@page import="java.text.SimpleDateFormat" %>
+<%@page import="java.util.Comparator" %>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
    "http://www.w3.org/TR/html4/loose.dtd">
@@ -101,7 +102,6 @@
                     <ul id="listing">
 <%
     MongoController m = new MongoController();
-    if (!m.alive()) throw new IOException("mongo connection is dead");
 
     SimpleDateFormat df = new SimpleDateFormat("MMM d, yyyy");
 
@@ -122,11 +122,22 @@
         }
     }
 
-    Collections.shuffle(lo);
+    Collections.sort(lo, new Comparator<Map>() {
+        public int compare(Map a, Map b) {
+            Double rating_a = Double.valueOf(a.get("rating").toString()),
+                   rating_b = Double.valueOf(b.get("rating").toString());
+
+            if (null != rating_a && null != rating_b)
+                return -1 * rating_a.compareTo(rating_b);
+            return 0;
+        }
+    });
+    
     if (false == lo.isEmpty()) {
         String[] keyword, ref;
         String _id, k, r, desc, explain, rating;
-        Map<String, Object>[] vote;
+        Map<String, Double> votes;
+        Double user_rating, average;
 
         for (Map<String, Object> o : lo) {
 
@@ -134,16 +145,12 @@
 
             keyword = (String[]) o.get("keyword");
             ref     = (String[]) o.get("ref");
-            vote    = (Map<String, Object>[]) o.get("vote");
+            votes   = (Map<String, Double>) o.get("votes");
+            average = Double.valueOf(o.get("rating").toString());
 
-            rating = "";
-            if (null != vote) {
-                for (Map<String, Object> v : vote) {
-                    if (v.get("voter").equals(USER)) {
-                        rating = ", curvalue:" + v.get("rating"); break;
-                    }
-                }
-            }
+            rating = ""; user_rating = null;
+            if (null != votes)       user_rating = votes.get(USER);
+            if (null != user_rating) rating = ", curvalue:" + user_rating;
 
             k = "";
             for (int i = 0; i < keyword.length; ++i) {
@@ -197,6 +204,7 @@
     <%
         out.println("<div id=\"vote_" + _id + "\" class=\"rating\"></div>");
     %>
+
     <div style="float: right">
         - <span class="timestamp"><% out.print(df.format(o.get("create"))); %></span>
     </div>
@@ -204,7 +212,7 @@
 <script type="text/javascript">
     $(document).ready(function() {
         $('#vote_<% out.print(_id); %>').rating(
-            'vote?oid=<% out.print(_id); %>',
+            'evaluate?action=vote&oid=<% out.print(_id); %>',
             {maxvalue:5, increment:.5<% out.print(rating); %>}
         );
     });

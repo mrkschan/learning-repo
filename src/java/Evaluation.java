@@ -13,9 +13,9 @@ import org.owasp.esapi.filters.SafeResponse;
 import util.AuthHandler;
 import util.ErrorHandler;
 
-public class Vote extends HttpServlet {
-
-    /**
+public class Evaluation extends HttpServlet {
+   
+    /** 
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
      * @param request servlet request
      * @param response servlet response
@@ -32,78 +32,66 @@ public class Vote extends HttpServlet {
         SafeRequest  req = ESAPI.httpUtilities().getCurrentRequest();
         SafeResponse res = ESAPI.httpUtilities().getCurrentResponse();
 
-        String user   = USER;
-        String oid    = req.getParameter("oid");
-        Double rating = Double.valueOf(req.getParameter("rating"));
+        String action = req.getParameter("action");
+        
+             if (action.equals("vote"))     vote(req, res, USER);
+        else if (action.equals("view"))     view(req, res, USER);
+        else if (action.equals("annotate")) annotate(req, res, USER);
+    }
 
-        if (-1 == rating.compareTo(0d) || 1 == rating.compareTo(5d)) {
-            // less than 0 or larger than 5
-            ErrorHandler.reportError(response,
-                "Vote Rating less than 0 or larger than 5");
-        }
+    void vote(HttpServletRequest req, HttpServletResponse res, String user) 
+    throws ServletException, IOException {
+        
+        String oid = req.getParameter("oid");
+        Double user_rating = Double.valueOf(req.getParameter("rating"));
+
+        if (-1 == user_rating.compareTo(0d) || 1 == user_rating.compareTo(5d))
+            ErrorHandler.reportError(res, "Vote Rating less than 0 or larger than 5");
+
+        MongoController m = new MongoController();
 
         Map<String, Object> q = new LinkedHashMap();
         q.put("_id", oid);
 
-        MongoController m = new MongoController();
-        if (!m.alive()) throw new IOException("mongo connection is dead");
         Map<String, Object> o = m.getObject(q);
+        if (null == o) ErrorHandler.reportError(res, "Learning Object not found");
 
-        if (null == o) {
-            // learning object not found
-            ErrorHandler.reportError(response, "Learning Object not found");
-        }
+        
+        // object.votes
+        Map<String, Double> votes = (Map) o.get("votes");
 
-        Map<String, Object>[] v = (Map[]) o.get("vote");
+        if (null == votes) votes = new LinkedHashMap<String, Double>();
+        votes.put(user, user_rating);
 
-        Map<String, Object> _vote = null;
-        double sum = 0.0d;
-        if (null != v) {
-            for (Map<String, Object>_v : v) {
-                if (_v.get("voter").equals(user)) {
-                    // found vote by session[user]
-                    _vote = _v;
-                } else {
-                    sum += Double.valueOf(_v.get("rating").toString());
-                }
-            }
-        }
+        Double average, sum = .0;
+        for (Double r : votes.values()) sum += r;
+        average = sum / votes.size();
 
-        if (null == _vote) {
-            // no vote yet
-            Map<String, Object>[] nv = null;
-            if (v != null) {
-                nv = new Map[v.length + 1];
-                System.arraycopy(v, 0, nv, 0, v.length);
-            } else {
-                nv = new Map[1];
-            }
-            v = nv;
-
-            // create vote
-            _vote = new LinkedHashMap<String, Object>();
-            v[v.length - 1] = _vote;
-            _vote.put("voter", user);
-        }
-        _vote.put("rating", rating);
-        sum += rating;
-
-        o.put("rating", sum / v.length);
-        o.put("vote", v);
-
+        o.put("rating", average);
+        o.put("votes",  votes);
+        
         m.updateObject(oid, o);
 
+        
         res.setContentType("application/json;charset=UTF-8");
         PrintWriter out = res.getWriter();
         try {
-            out.println(sum / v.length);
+            out.println(average);
         } finally {
             out.close();
         }
     }
 
+    void view(HttpServletRequest req, HttpServletResponse res, String user)
+    throws ServletException, IOException {
+    }
+
+    void annotate(HttpServletRequest req, HttpServletResponse res, String user)
+    throws ServletException, IOException {
+    }
+
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
+    /** 
      * Handles the HTTP <code>GET</code> method.
      * @param request servlet request
      * @param response servlet response
@@ -114,9 +102,9 @@ public class Vote extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
         processRequest(request, response);
-    }
+    } 
 
-    /**
+    /** 
      * Handles the HTTP <code>POST</code> method.
      * @param request servlet request
      * @param response servlet response
@@ -129,7 +117,7 @@ public class Vote extends HttpServlet {
         processRequest(request, response);
     }
 
-    /**
+    /** 
      * Returns a short description of the servlet.
      * @return a String containing servlet description
      */

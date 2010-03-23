@@ -9,6 +9,7 @@ import com.mongodb.DBObject;
 import com.mongodb.Mongo;
 import com.mongodb.ObjectId;
 import config.Config;
+import java.io.IOException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -26,12 +27,7 @@ public class MongoController {
     private DBCollection themes;
     private DBCollection objects;
 
-    private boolean error = true;
-    public boolean alive() {
-        return (false == error);
-    }
-
-    public MongoController () {
+    public MongoController() throws IOException {
         try {
             Config c   = new Config();
             String ip  = c.getConfig("mongodb_ip");
@@ -50,16 +46,14 @@ public class MongoController {
             themes  = repo.getCollection("theme");
             objects = repo.getCollection("object");
 
-            error = false;
-
         } catch (Exception ex) {
-            error = true;
-
             themes  = null;
             objects = null;
             repo    = null;
             m       = null;
             Logger.getLogger(MongoController.class.getName()).log(Level.SEVERE, null, ex);
+
+            throw new IOException("mongo is dead.");
         }
     }
 
@@ -141,7 +135,7 @@ public class MongoController {
         o.put("explain", explain);
         o.put("keyword", keyword);
         o.put("ref", ref);
-        o.put("rating", 0);
+        o.put("rating", .0);
         o.put("submit", submit_by);
         o.put("create", new Date());
 

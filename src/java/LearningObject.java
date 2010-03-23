@@ -72,7 +72,6 @@ public class LearningObject extends HttpServlet {
         }
 
         MongoController m = new MongoController();
-        if (!m.alive()) throw new IOException("mongo connection is dead");
 
         // validation
         {

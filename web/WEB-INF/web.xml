@@ -25,8 +25,8 @@
         <servlet-class>LearningObject</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>Vote</servlet-name>
-        <servlet-class>Vote</servlet-class>
+        <servlet-name>Evaluation</servlet-name>
+        <servlet-class>Evaluation</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>DefineTheme</servlet-name>
@@ -53,8 +53,8 @@
         <url-pattern>/download</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>Vote</servlet-name>
-        <url-pattern>/vote</url-pattern>
+        <servlet-name>Evaluation</servlet-name>
+        <url-pattern>/evaluate</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
