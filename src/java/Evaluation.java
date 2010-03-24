@@ -110,14 +110,21 @@ public class Evaluation extends HttpServlet {
         if (null == o) ErrorHandler.reportError(res, "Learning Object not found");
 
 
-        // object.views
-        Map<String, Boolean> views = (Map) o.get("views");
+        // get view of user
+        Map<String, Object> qv = new LinkedHashMap();
+        qv.put("viewer", user);
+        qv.put("oid", oid);
+        Map<String, Object> view = m.getView(qv);
 
-        if (null == views) views = new LinkedHashMap<String, Boolean>();
-        views.put(user, true);
+        if (null == view) m.saveView(oid, user);
 
-        o.put("views", views);
 
+        // update view count of object
+        Map<String, Object> qvc = new LinkedHashMap();
+        qvc.put("oid", oid);
+        Long view_count = m.getViewCount(qvc);
+
+        o.put("view_count", Double.valueOf(view_count.toString()));
         m.updateObject(oid, o);
     }
 

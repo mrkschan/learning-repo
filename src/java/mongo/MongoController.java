@@ -52,9 +52,15 @@ public class MongoController {
 
             // create index for votes
             DBObject vote_idx = new BasicDBObject();
-            vote_idx.put("voter", 1);
             vote_idx.put("oid", 1);
+            vote_idx.put("voter", 1);
             votes.ensureIndex(vote_idx);
+
+            // create index for views
+            DBObject view_idx = new BasicDBObject();
+            view_idx.put("oid", 1);
+            view_idx.put("viewer", 1);
+            views.ensureIndex(view_idx);
 
         } catch (Exception ex) {
             Logger.getLogger(MongoController.class.getName()).log(Level.SEVERE, null, ex);
@@ -141,7 +147,8 @@ public class MongoController {
         o.put("explain", explain);
         o.put("keyword", keyword);
         o.put("ref", ref);
-        o.put("rating", .0);
+        o.put("rating", new Double(.0));
+        o.put("view_count", new Double(0));
         o.put("submit", submit_by);
         o.put("create", new Date());
 
@@ -274,6 +281,70 @@ public class MongoController {
     private Map<String, Object> voteToMap(DBObject o) {
         return o.toMap();
     }
+
+    public void saveView(String oid, String viewer) {
+        BasicDBObject o = new BasicDBObject();
+
+        o.put("oid", oid);
+        o.put("viewer", viewer);
+
+        views.insert(o);
+    }
+
+    public List<Map<String, Object>> dumpView() {
+        return queryView(null);
+    }
+
+    public List<Map<String, Object>> queryView(Map<String, Object> view) {
+
+        if (null != view) {
+            String _id = (String) view.get("_id");
+            if (null != _id) view.put("_id", new ObjectId(_id));
+        }
+
+        DBCursor c = (null == view)
+                     ? views.find()
+                     : views.find(new BasicDBObject(view));
+        if (0 == c.count()) return null;
+
+        List<Map<String, Object>> l = new LinkedList<Map<String, Object>>();
+        while (c.hasNext()) {
+            l.add(viewToMap(c.next()));
+        }
+
+        return l;
+    }
+
+    public Map<String, Object> getView(Map<String, Object> view) {
+
+        String _id = (String) view.get("_id");
+        if (null != _id) view.put("_id", new ObjectId(_id));
+
+        DBObject o = views.findOne(new BasicDBObject(view));
+
+        if (null == o) return null;
+
+        return viewToMap(o);
+    }
+
+    private Map<String, Object> viewToMap(DBObject o) {
+        return o.toMap();
+    }
+
+    public long getViewCount(Map<String, Object> view) {
+        
+        if (null != view) {
+            String _id = (String) view.get("_id");
+            if (null != _id) view.put("_id", new ObjectId(_id));
+        }
+
+        long c = (null == view)
+                 ? views.getCount()
+                 : views.getCount(new BasicDBObject(view));
+
+        return c;
+    }
+
 /*
     public Map<String, Object> getFile(Map<String, Object> object) {
 
