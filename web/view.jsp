@@ -39,6 +39,11 @@
         <script type="text/javascript" src="timesink/jquery.timesink.js"></script>
         <link rel="stylesheet" href="timesink/timesink.css" type="text/css" />
 
+
+<!-- theme filter -->
+        <script type="text/javascript" src="themefilter.js"></script>
+        <link rel="stylesheet" href="themefilter.css" type="text/css" />
+
 <!-- Custom settings -->
     <style type="text/css">
         #listing {
@@ -132,34 +137,45 @@
                             <a href="#" class="button" style="float: none" onclick="collapse_all()">Collapse All</a>
                         </td>
                     </tr>
+<%
+    MongoController m = new MongoController();
+
+    Map<String, Object> qt = new LinkedHashMap();
+    qt.put("show", true);
+    List<Map<String, Object>> lt  = m.queryTheme(qt);
+
+    if (null != lt) {
+%>
+                    <tr>
+                        <td colspan="2" style="padding-bottom: 0px;">
+                            <label>Filter by Theme:</label>
+                            <ul id="themefilter" class="theme_filter">
+<%
+        for (Map _m : lt) out.print("<li>&gt; " + _m.get("name") + "</li>");
+%>
+                            </ul>
+                        </td>
+                    </tr>
+<%
+    }
+%>
                     <tr>
                         <td colspan="2">
+                            <label>Filter by Time:</label>
                             <ul id="timesink" class="ts_filter">
-                                <li>&gt; Show item within a Quarter</li>
-                                <li>&gt; Show item within a Year</li>
+                                <li>&gt; Within a Quarter</li>
+                                <li>&gt; Within a Year</li>
                             </ul>
                         </td>
                     </tr>
                 </table>
-<script type="text/javascript">
-    function reset_filter() {
-        $('#filter').val('');
-        $('#listing').children('li').show();
-        timesink.sieve = null;
-    }
-</script>
                 </div>
                 <div>
                     <ul id="listing">
 <%
-    MongoController m = new MongoController();
-
     SimpleDateFormat df = new SimpleDateFormat("MMM d, yyyy");
 
-    Map<String, Object> qo, qt = new LinkedHashMap();
-    qt.put("show", true);
-
-    List<Map<String, Object>> lt  = m.queryTheme(qt);
+    Map<String, Object> qo;
     List<Map<String, Object>> lo  = new LinkedList();
     List<Map<String, Object>> buf = null;
 
@@ -234,7 +250,7 @@
 %>
 <li>
 
-<div class="expand" id="head_<% out.print(_id); %>">
+    <div class="expand" id="head_<% out.print(_id); %>" theme="<% out.print(o.get("theme")); %>">
     <h2 class="bigcap"><% out.println(o.get("summary").toString()); %></h2>
     <i>&gt; <% out.print(k); %></i>
 </div>
@@ -291,7 +307,16 @@
 %>
                     </ul>
 <script type="text/javascript">
-    var toggler, liveupdate, timesink;
+
+    function reset_filter() {
+        $('#listing').children('li').show();
+
+        $('#filter').val('');
+        timesink.sieve    = null;
+        themefilter.theme = null;
+    }
+
+    var toggler, liveupdate, timesink, themefilter;
     $(document).ready(function() {
 
         // keyword filter
@@ -322,20 +347,46 @@
             }
 	);
 
-        $('#listing').bind('liveupdate-show', function(evt, el) {
-            if (null != timesink.sieve) {
-                if (new Date($('.timestamp', el).html()) < timesink.sieve) {
+        // theme filter
+        themefilter = $('#themefilter').themefilter('#listing');
+
+        // filter registry -
+        // only process el which is going to be show
+        // hide those el that "should-not-show"
+        var filter_registry = [
+            function(evt, el) {
+                // themefilter filter
+                if (null != themefilter.theme) {
+                    if ($('.expand', el).attr('theme') != themefilter.theme) {
+                        $(el).hide();
+                    }
+                }
+            },
+            function(evt, el) {
+                // timesink filter
+                if (null != timesink.sieve) {
+                    if (new Date($('.timestamp', el).html()) < timesink.sieve) {
+                        $(el).hide();
+                    }
+                }
+            },
+            function(evt, el) {
+                // keyword filter
+                var term = $.trim( $('#filter').val().toLowerCase() );
+                var line = $('.expand a',el).html().toLowerCase();
+                if (line.score(term) == 0) {
                     $(el).hide();
                 }
             }
-        });
-        $('#listing').bind('timesink-show', function(evt, el) {
-            var term = $.trim( $('#filter').val().toLowerCase() );
-            var line = $('.expand a',el).html().toLowerCase();
-            if (line.score(term) == 0) {
-                $(el).hide();
-            }
-        });
+        ];
+        var _filter = function(evt, el) {
+            for (var f in filter_registry) filter_registry[f](evt, el);
+        }
+
+        // bind show listener for filtering
+        $('#listing').bind('liveupdate-show',  _filter);
+        $('#listing').bind('timesink-show',    _filter);
+        $('#listing').bind('themefilter-show', _filter);
     });
 
     function collapse_all() {
