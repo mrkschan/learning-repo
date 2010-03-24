@@ -380,7 +380,9 @@
             }
         ];
         var _filter = function(evt, el) {
-            for (var f in filter_registry) filter_registry[f](evt, el);
+            for (var f in filter_registry) {
+                if ($(el).is(":visible")) filter_registry[f](evt, el);
+            }
         }
 
         // bind show listener for filtering
