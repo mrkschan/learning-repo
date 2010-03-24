@@ -93,6 +93,7 @@
             border-bottom: 0px;
             border-right: 0px;
         }
+        table { margin-bottom: .5em; }
     </style>
     </head>
     <body>
@@ -177,6 +178,7 @@
             // sort (DESC) by view * avg
             // avg  = [1, 6] view = [1, inf]
 
+            // TODO: cache this view count
             Map views_a = (Map) a.get("views");
             Map views_b = (Map) b.get("views");
 
@@ -196,22 +198,26 @@
     });
     
     if (false == lo.isEmpty()) {
+
         String[] keyword, ref;
         String _id, k, r, desc, explain, rating;
-        Map<String, Double> votes;
         Double user_rating, average;
+        Map<String, Object> vote = null;
+        Map<String, Object> qv = new LinkedHashMap<String, Object>();
+        qv.put("voter", USER);
 
         for (Map<String, Object> o : lo) {
 
             _id = o.get("_id").toString();
+            qv.put("oid", _id);
 
             keyword = (String[]) o.get("keyword");
             ref     = (String[]) o.get("ref");
-            votes   = (Map<String, Double>) o.get("votes");
+            vote    = m.getVote(qv);
             average = Double.valueOf(o.get("rating").toString());
 
             rating = ""; user_rating = null;
-            if (null != votes)       user_rating = votes.get(USER);
+            if (null != vote)        user_rating = Double.valueOf(vote.get("rating").toString());
             if (null != user_rating) rating = ", curvalue:" + user_rating;
 
             k = "";

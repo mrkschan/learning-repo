@@ -26,6 +26,8 @@ public class MongoController {
 //    private GridFS gfs;
     private DBCollection themes;
     private DBCollection objects;
+    private DBCollection votes;
+    private DBCollection views;
 
     public MongoController() throws IOException {
         try {
@@ -45,12 +47,16 @@ public class MongoController {
 
             themes  = repo.getCollection("theme");
             objects = repo.getCollection("object");
+            votes   = repo.getCollection("vote");
+            views   = repo.getCollection("view");
+
+            // create index for votes
+            DBObject vote_idx = new BasicDBObject();
+            vote_idx.put("voter", 1);
+            vote_idx.put("oid", 1);
+            votes.ensureIndex(vote_idx);
 
         } catch (Exception ex) {
-            themes  = null;
-            objects = null;
-            repo    = null;
-            m       = null;
             Logger.getLogger(MongoController.class.getName()).log(Level.SEVERE, null, ex);
 
             throw new IOException("mongo is dead.");
@@ -209,6 +215,64 @@ public class MongoController {
         hm.put("vote", vote);
 
         return hm;
+    }
+
+    public void saveVote(String oid, Double rating, String voter) {
+        BasicDBObject o = new BasicDBObject();
+
+        o.put("oid", oid);
+        o.put("voter", voter);
+        o.put("rating", rating);
+
+        votes.insert(o);
+    }
+
+    public void updateVote(String _id, Map<String, Object> vote) {
+
+        votes.update(
+            new BasicDBObject("_id", new ObjectId(_id)),
+            new BasicDBObject(vote)
+        );
+    }
+
+    public List<Map<String, Object>> dumpVote() {
+        return queryVote(null);
+    }
+
+    public List<Map<String, Object>> queryVote(Map<String, Object> vote) {
+
+        if (null != vote) {
+            String _id = (String) vote.get("_id");
+            if (null != _id) vote.put("_id", new ObjectId(_id));
+        }
+
+        DBCursor c = (null == vote)
+                     ? votes.find()
+                     : votes.find(new BasicDBObject(vote));
+        if (0 == c.count()) return null;
+
+        List<Map<String, Object>> l = new LinkedList<Map<String, Object>>();
+        while (c.hasNext()) {
+            l.add(voteToMap(c.next()));
+        }
+
+        return l;
+    }
+
+    public Map<String, Object> getVote(Map<String, Object> vote) {
+
+        String _id = (String) vote.get("_id");
+        if (null != _id) vote.put("_id", new ObjectId(_id));
+
+        DBObject o = votes.findOne(new BasicDBObject(vote));
+
+        if (null == o) return null;
+
+        return voteToMap(o);
+    }
+
+    private Map<String, Object> voteToMap(DBObject o) {
+        return o.toMap();
     }
 /*
     public Map<String, Object> getFile(Map<String, Object> object) {

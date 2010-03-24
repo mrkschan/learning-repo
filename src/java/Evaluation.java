@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -50,26 +51,39 @@ public class Evaluation extends HttpServlet {
 
         MongoController m = new MongoController();
 
-        Map<String, Object> q = new LinkedHashMap();
-        q.put("_id", oid);
+        Map<String, Object> qo = new LinkedHashMap();
+        qo.put("_id", oid);
 
-        Map<String, Object> o = m.getObject(q);
+        Map<String, Object> o = m.getObject(qo);
         if (null == o) ErrorHandler.reportError(res, "Learning Object not found");
 
-        
-        // object.votes
-        Map<String, Double> votes = (Map) o.get("votes");
 
-        if (null == votes) votes = new LinkedHashMap<String, Double>();
-        votes.put(user, user_rating);
+        // update vote of user
+        Map<String, Object> qv = new LinkedHashMap();
+        qv.put("voter", user);
+        qv.put("oid", oid);
+        Map<String, Object> vote = m.getVote(qv);
 
-        Double average, sum = .0;
-        for (Double r : votes.values()) sum += r;
+        if (null == vote) {
+            m.saveVote(oid, user_rating, user);
+        } else {
+            vote.put("rating", user_rating);
+            m.updateVote(vote.get("_id").toString(), vote);
+        }
+
+
+        // get all votes for object
+        Map<String, Object> qvo = new LinkedHashMap();
+        qvo.put("oid", oid);
+        List<Map<String, Object>> votes = m.queryVote(qvo);
+
+        double average, sum = .0;
+        for (Map<String, Object> v : votes) {
+            sum += Double.valueOf(v.get("rating").toString());
+        }
         average = sum / votes.size();
 
         o.put("rating", average);
-        o.put("votes",  votes);
-        
         m.updateObject(oid, o);
 
         
