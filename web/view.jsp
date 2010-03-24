@@ -34,13 +34,17 @@
         <script type="text/javascript" src="rating/jquery.rating.js"></script>
         <link rel="stylesheet" href="rating/rating.css" type="text/css" />
 
-<!--jQuery-plugin: timesink settings -->
+<!-- jQuery-plugin: timesink settings -->
 <!-- http://github.com/mrkschan/jquery-timesink-plugin -->
         <script type="text/javascript" src="timesink/jquery.timesink.js"></script>
         <link rel="stylesheet" href="timesink/timesink.css" type="text/css" />
 
+<!-- jQuery-plugin: jTags settings -->
+<!-- http://www.benoitvidis.com/2009/09/jtags-plugin/ -->
+        <script type="text/javascript" src="jtags/jquery.jtags.js"></script>
+        <link rel="stylesheet" href="jtags/jtags.css" type="text/css" />
 
-<!-- theme filter -->
+<!-- jQuery-plugin: theme filter settings-->
         <script type="text/javascript" src="themefilter.js"></script>
         <link rel="stylesheet" href="themefilter.css" type="text/css" />
 
@@ -382,6 +386,7 @@
         var _filter = function(evt, el) {
             for (var f in filter_registry) {
                 if ($(el).is(":visible")) filter_registry[f](evt, el);
+                else                      break;
             }
         }
 
