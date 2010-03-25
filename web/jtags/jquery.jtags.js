@@ -1,23 +1,24 @@
-$.fn.tags = function(){
+$.fn.tags = function(annotate) {
 	var origin_element = this;
-	
+
 	var o = {
 		e: null,
 		ed: null,
 		tags:[],
-		
+
 		init:function(){
 			this.e = origin_element;
 			var that = this;
 
 			var n = $(this.e).next();
 			if ( /jq_tags_editor/.test(n.attr('class')) )
-			{	
+			{
 				this.ed = n.get(0);
-			}			
+			}
 			else
 			{
-				$(this.e).after('<div class="jq_tags_editor"><span class="jq_tags_tokens"></span><input type="text" class="jq_tags_editor_input" /></div>');
+				//~ $(this.e).after('<div class="jq_tags_editor"><span class="jq_tags_tokens"></span><input type="text" class="jq_tags_editor_input" /></div>');
+				$(this.e).after('<div class="jq_tags_editor"><span class="jq_tags_tokens"></span><input type="text" class="jq_tags_editor_input" /><div style="float: right"><a href="#" class="button">Annotate!</a></div></div>');
 				this.ed = $(this.e).next();
 			}
 
@@ -41,27 +42,37 @@ $.fn.tags = function(){
 						}
 					});
 
+			// annotate button
+			if (annotate) {
+				$('.button', this.ed).click(function() {
+					annotate(origin_element);
+					return false;
+				});
+			}
+
 			r = $(this.e).val().split(',');
 			this.tags = []
 			for(i in r)
 			{
-				r[i] = r[i].replace(/[", ]/gi, '');
+				//~ r[i] = r[i].replace(/[", ]/gi, '');
+				r[i] = r[i].replace(/[",]/gi, '');
 				if(r[i] != '')
 				{	this.tags.push(r[i]);	}
 			}
-			this.refresh_list();			
+			this.refresh_list();
 		},
-		
+
 		add_tag:function(){
 			var tag_txt = $(this.ed).find('input')
-				.val().replace(/[", ]/gi, '');
-			
+				.val().replace(/[",]/gi, '');
+				//~ .val().replace(/[", ]/gi, '');
+
 			if( (tag_txt != '') && (jQuery.inArray(tag_txt, this.tags) < 0) ){
 				this.tags.push(tag_txt);
 				this.refresh_list();
 			}
 			$(this.ed).find('input').val('');
-		},		
+		},
 		remove_tag:function(tag_txt){
 			r = [];
 			for(i in this.tags){
@@ -70,13 +81,13 @@ $.fn.tags = function(){
 			}
 			this.tags = r;
 			this.refresh_list();
-		},		
+		},
 		refresh_list: function(){
 			var that = this;
-			
+
 			$(this.ed).find('span.jq_tags_tokens').html('');
 			$(this.e).val(this.tags.join(', '));
-			
+
 			h = '';
 			for(i in that.tags){
 				h += '<div class="jq_tags_token">' + that.tags[i] + '<a href="#">x</a></div>';
@@ -88,14 +99,16 @@ $.fn.tags = function(){
 					.find('div.jq_tags_token')
 						.find('a')
 							.click(function(){
-								var tag_txt = $(this).parents('.jq_tags_token:first').html().replace(/<a(.*?)<\/a>/, ''); 
+								var tag_txt = $(this).parents('.jq_tags_token:first').html().replace(/<a(.*?)<\/a>/, '');
 								that.remove_tag(tag_txt);
+
+                                                                return false;
 							});
 		}
-		
+
 	};
 	o.init();
-	
-	
-	
+
+
+
 };

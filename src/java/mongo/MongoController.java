@@ -28,6 +28,7 @@ public class MongoController {
     private DBCollection objects;
     private DBCollection votes;
     private DBCollection views;
+    private DBCollection annotations;
 
     public MongoController() throws IOException {
         try {
@@ -45,10 +46,11 @@ public class MongoController {
             }
 //            gfs = new GridFS(repo);
 
-            themes  = repo.getCollection("theme");
-            objects = repo.getCollection("object");
-            votes   = repo.getCollection("vote");
-            views   = repo.getCollection("view");
+            themes      = repo.getCollection("theme");
+            objects     = repo.getCollection("object");
+            votes       = repo.getCollection("vote");
+            views       = repo.getCollection("view");
+            annotations = repo.getCollection("annotation");
 
             // create index for votes
             DBObject vote_idx = new BasicDBObject();
@@ -61,6 +63,12 @@ public class MongoController {
             view_idx.put("oid", 1);
             view_idx.put("viewer", 1);
             views.ensureIndex(view_idx);
+
+            // create index for annotations
+            DBObject annotate_idx = new BasicDBObject();
+            annotate_idx.put("oid", 1);
+            annotate_idx.put("whom", 1);
+            annotations.ensureIndex(annotate_idx);
 
         } catch (Exception ex) {
             Logger.getLogger(MongoController.class.getName()).log(Level.SEVERE, null, ex);
@@ -343,6 +351,72 @@ public class MongoController {
                  : views.getCount(new BasicDBObject(view));
 
         return c;
+    }
+
+    public void saveAnnotation(String oid, String[] keyword, String whom) {
+        BasicDBObject o = new BasicDBObject();
+
+        o.put("oid", oid);
+        o.put("whom", whom);
+        o.put("keyword", keyword);
+
+        annotations.insert(o);
+    }
+
+    public void updateAnnotation(String _id, Map<String, Object> annotation) {
+
+        annotations.update(
+            new BasicDBObject("_id", new ObjectId(_id)),
+            new BasicDBObject(annotation)
+        );
+    }
+
+    public List<Map<String, Object>> dumpAnnotation() {
+        return queryAnnotation(null);
+    }
+
+    public List<Map<String, Object>> queryAnnotation(Map<String, Object> annotation) {
+
+        if (null != annotation) {
+            String _id = (String) annotation.get("_id");
+            if (null != _id) annotation.put("_id", new ObjectId(_id));
+        }
+
+        DBCursor c = (null == annotation)
+                     ? annotations.find()
+                     : annotations.find(new BasicDBObject(annotation));
+        if (0 == c.count()) return null;
+
+        List<Map<String, Object>> l = new LinkedList<Map<String, Object>>();
+        while (c.hasNext()) {
+            l.add(annotationToMap(c.next()));
+        }
+
+        return l;
+    }
+
+    public Map<String, Object> getAnnotation(Map<String, Object> annotation) {
+
+        String _id = (String) annotation.get("_id");
+        if (null != _id) annotation.put("_id", new ObjectId(_id));
+
+        DBObject o = annotations.findOne(new BasicDBObject(annotation));
+
+        if (null == o) return null;
+
+        return annotationToMap(o);
+    }
+
+    private Map<String, Object> annotationToMap(DBObject o) {
+        Map<String, Object> hm = o.toMap();
+
+        BasicDBList k = (BasicDBList) hm.get("keyword");
+        String[] keyword = (null == k)? null : new String[k.size()];
+        if (null != keyword) k.toArray(keyword);
+
+        hm.put("keyword", keyword);
+
+        return hm;
     }
 
 /*

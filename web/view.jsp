@@ -44,7 +44,7 @@
         <script type="text/javascript" src="jtags/jquery.jtags.js"></script>
         <link rel="stylesheet" href="jtags/jtags.css" type="text/css" />
 
-<!-- jQuery-plugin: theme filter settings-->
+<!-- theme filter settings-->
         <script type="text/javascript" src="themefilter.js"></script>
         <link rel="stylesheet" href="themefilter.css" type="text/css" />
 
@@ -103,6 +103,13 @@
             border-right: 0px;
         }
         table { margin-bottom: .5em; }
+
+        .jq_tags_editor {
+            padding: 2px 0px 0px 2px;
+        }
+        .jq_tags_editor_input {
+            outline-width: 0px !important;
+        }
     </style>
     </head>
     <body>
@@ -216,21 +223,29 @@
     if (false == lo.isEmpty()) {
 
         String[] keyword, ref;
-        String _id, k, r, desc, explain, rating;
+        String _id, k, r, desc, explain, rating, tags;
         Double user_rating, average;
-        Map<String, Object> vote = null;
+
+        Map<String, Object> vote = null, annotation = null;
+
         Map<String, Object> qv = new LinkedHashMap<String, Object>();
         qv.put("voter", USER);
+
+        Map<String, Object> qa = new LinkedHashMap<String, Object>();
+        qa.put("whom", USER);
 
         for (Map<String, Object> o : lo) {
 
             _id = o.get("_id").toString();
             qv.put("oid", _id);
+            qa.put("oid", _id);
 
             keyword = (String[]) o.get("keyword");
             ref     = (String[]) o.get("ref");
-            vote    = m.getVote(qv);
             average = Double.valueOf(o.get("rating").toString());
+
+            vote       = m.getVote(qv);
+            annotation = m.getAnnotation(qa);
 
             rating = ""; user_rating = null;
             if (null != vote)        user_rating = Double.valueOf(vote.get("rating").toString());
@@ -249,7 +264,17 @@
                 }
             }
 
-            desc    = "<pre>" + o.get("desc").toString() + "</pre>";
+            tags = "";
+            if (null != annotation) {
+                String[] tag = (String[]) annotation.get("keyword");
+                for (int i = 0; i < tag.length; ++i) {
+                    if (i == 0) tags += tag[i];
+                    else        tags += ", " + tag[i];
+                }
+                tags = "value=\"" + tags + "\"";
+            }
+
+            desc    = "<pre>" + o.get("desc").toString()    + "</pre>";
             explain = "<pre>" + o.get("explain").toString() + "</pre>";
 %>
 <li>
@@ -260,6 +285,11 @@
 </div>
 
 <div class="collapse">
+
+    <div style="float: right">
+        - <span class="timestamp"><% out.print(df.format(o.get("create"))); %></span>
+    </div>
+
     <label>Media Type:</label>
     <span><% out.println(o.get("type").toString()); %></span>
     <br /><br />
@@ -287,12 +317,13 @@
     <%
         out.println("<div id=\"vote_" + _id + "\" class=\"rating\"></div>");
     %>
+    <p></p>
+
+    <label>Your Keyword Annotation (Comma separated):</label>
+    <input type="text" id="annotate_<% out.print(_id); %>" class="tags" <% out.print(tags); %> />
+
 <!--  avg: <% out.print(average); %> -->
 <!-- view: <% out.print(o.get("view_count")); %> -->
-
-    <div style="float: right">
-        - <span class="timestamp"><% out.print(df.format(o.get("create"))); %></span>
-    </div>
 
 <script type="text/javascript">
     $(document).ready(function() {
@@ -300,6 +331,10 @@
             'evaluate?action=vote&oid=<% out.print(_id); %>',
             {maxvalue:5, increment:.5<% out.print(rating); %>}
         );
+
+        $('#annotate_<% out.print(_id); %>').tags(function(o) {
+            $.ajax({ url: 'evaluate?action=annotate&oid=<% out.print(_id); %>&keyword=' + $(o).val()});
+        });
     });
 </script>
 </div>
@@ -310,6 +345,10 @@
     }
 %>
                     </ul>
+                </div>
+            </fieldset>
+<%@include file="template/credit.jspf" %>
+        </div>
 <script type="text/javascript">
 
     function reset_filter() {
@@ -318,6 +357,14 @@
         $('#filter').val('');
         timesink.sieve    = null;
         themefilter.theme = null;
+    }
+
+    function collapse_all() {
+        toggler.each(function() {
+            if ($(this).hasClass('open')) {
+                $(this).removeClass('open').next('div.collapse').hide();
+            }
+        });
     }
 
     var toggler, liveupdate, timesink, themefilter;
@@ -395,18 +442,6 @@
         $('#listing').bind('timesink-show',    _filter);
         $('#listing').bind('themefilter-show', _filter);
     });
-
-    function collapse_all() {
-        toggler.each(function() {
-            if ($(this).hasClass('open')) {
-                $(this).removeClass('open').next('div.collapse').hide();
-            }
-        });
-    }
 </script>
-                </div>
-            </fieldset>
-<%@include file="template/credit.jspf" %>
-        </div>
     </body>
 </html>

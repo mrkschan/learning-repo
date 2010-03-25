@@ -85,15 +85,6 @@ public class Evaluation extends HttpServlet {
 
         o.put("rating", average);
         m.updateObject(oid, o);
-
-        
-        res.setContentType("application/json;charset=UTF-8");
-        PrintWriter out = res.getWriter();
-        try {
-            out.println(average);
-        } finally {
-            out.close();
-        }
     }
 
     void view(HttpServletRequest req, HttpServletResponse res, String user)
@@ -130,6 +121,34 @@ public class Evaluation extends HttpServlet {
 
     void annotate(HttpServletRequest req, HttpServletResponse res, String user)
     throws ServletException, IOException {
+
+        String oid = req.getParameter("oid");
+
+        MongoController m = new MongoController();
+
+        Map<String, Object> q = new LinkedHashMap();
+        q.put("_id", oid);
+
+        Map<String, Object> o = m.getObject(q);
+        if (null == o) ErrorHandler.reportError(res, "Learning Object not found");
+
+
+        String _keyword = ESAPI.encoder().encodeForHTML(req.getParameter("keyword"));
+        String keyword[] = _keyword.split(",");
+        for (int i = 0; i < keyword.length; ++i) keyword[i] = keyword[i].trim();
+
+        // get annotation of user
+        Map<String, Object> qv = new LinkedHashMap();
+        qv.put("whom", user);
+        qv.put("oid", oid);
+        Map<String, Object> annotation = m.getAnnotation(qv);
+
+        if (null == annotation) {
+            m.saveAnnotation(oid, keyword, user);
+        } else {
+            annotation.put("keyword", keyword);
+            m.updateAnnotation(annotation.get("_id").toString(), annotation);
+        }
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
