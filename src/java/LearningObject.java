@@ -113,7 +113,8 @@ public class LearningObject extends HttpServlet {
             }
         }
 
-        String keyword[] = _keyword.replace(", ",",").split(",");
+        String keyword[] = _keyword.split(",");
+        for (int i = 0; i < keyword.length; ++i) keyword[i] = keyword[i].trim();
         m.saveObject(
             sid, pid, theme, type, summary, desc, explain, keyword, ref, USER
         );
