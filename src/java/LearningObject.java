@@ -90,6 +90,8 @@ public class LearningObject extends HttpServlet {
                 type, "MediaType", 8, false
             );
             okay &= (summary.length() <= 100);
+            okay &= (desc.length() <= 1024); // 1kB description limit (include \r\n)
+            okay &= (explain.length() <= 1024); // 1kB explain limit (include \r\n)
 
             if (null != ref) {
                 for (String _r : ref) {
