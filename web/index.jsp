@@ -173,8 +173,8 @@
                 pid: {required: true, digits: true, minlength: 8, maxlength: 8},
                 summary: {required: true, maxlength: 100},
                 keyword: {required: true},
-                desc: {required: true},
-                explain: {required: true},
+                desc: {required: true, maxlength: 1024},
+                explain: {required: true, maxlength: 1024},
                 type: {required: true}
             },
             submitHandler: function(form) { form.submit(); }
