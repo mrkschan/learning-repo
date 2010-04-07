@@ -3,6 +3,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import util.ErrorHandler;
 
 public class Auth extends HttpServlet {
 
@@ -17,10 +19,22 @@ public class Auth extends HttpServlet {
     throws ServletException, IOException {
 
         if (request.getMethod().equals("POST")) {
-            String user = request.getParameter("user");
-            if (null != user) {
-                request.getSession(true).setAttribute("user", user);
+            
+            String user  = request.getParameter("user"),
+                   nonce = request.getParameter("nonce");
+
+            HttpSession s = request.getSession();
+            if (null != s) {
+                String snonce = (String) s.getAttribute("nonce");
+
+                if (null != snonce && null != user && snonce.equals(nonce)) {
+                    s.removeAttribute("nonce");
+                    s.setAttribute("user", user);
+                } else {
+                    ErrorHandler.reportError(response, "Invalid Auth attempt");
+                }
             }
+            
         }
     }
 
