@@ -25,8 +25,8 @@ public class AuthHandler {
                 "&app_ip=" + request.getLocalAddr() +
                 "&app_port=" + request.getLocalPort() +
                 "&s=" + s.getId() +
-                "&referer=" + request.getRequestURL() +
-                "&nonce=" + nonce
+                "&nonce=" + nonce +
+                "&referer=" + request.getRequestURL()
             );
             return null;
         }
