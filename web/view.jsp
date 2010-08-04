@@ -11,6 +11,12 @@
 <%@page import="java.text.SimpleDateFormat" %>
 <%@page import="java.util.Comparator" %>
 
+<%@ page import="config.Config" %>
+
+<%
+    String admin = new Config().getConfig("admin");
+%>
+
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
    "http://www.w3.org/TR/html4/loose.dtd">
 
@@ -287,7 +293,14 @@
 <div class="collapse">
 
     <div style="float: right">
-        - <span class="timestamp"><% out.print(df.format(o.get("create"))); %></span>
+        - <span class="timestamp"><% out.print(df.format(o.get("create"))); %></span><br />
+        <% 
+            if (admin.contains(USER)) {
+        %>
+            <a class="button" href="edit.jsp?oid=<% out.print(_id); %>">Edit</a>
+        <%
+            }
+        %>
     </div>
 
     <label>Media Type:</label>

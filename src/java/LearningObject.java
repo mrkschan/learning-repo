@@ -41,7 +41,8 @@ public class LearningObject extends HttpServlet {
         Encoder e = ESAPI.encoder();
 
         Map pm = req.getParameterMap();
-        String sid      = req.getParameter("sid"),
+        String oid      = req.getParameter("oid"),
+               sid      = req.getParameter("sid"),
                pid      = req.getParameter("pid"),
                theme    = req.getParameter("theme"),
                type     = req.getParameter("type"),
@@ -115,11 +116,35 @@ public class LearningObject extends HttpServlet {
 
         String keyword[] = _keyword.split(",");
         for (int i = 0; i < keyword.length; ++i) keyword[i] = keyword[i].trim();
-        m.saveObject(
-            sid, pid, theme, type, summary, desc, explain, keyword, ref, USER
-        );
 
-        res.sendRedirect("?sid=" + sid + "&pid=" + pid);
+        if (null == oid) {
+            // new learning object
+            m.saveObject(
+                sid, pid, theme, type, summary, desc, explain, keyword, ref, USER
+            );
+
+            res.sendRedirect("?sid=" + sid + "&pid=" + pid);
+        } else {
+            // update learning object
+            Map<String, Object> qo = new LinkedHashMap();
+            qo.put("_id", oid);
+
+            Map<String, Object> o = m.getObject(qo);
+            if (null == o) ErrorHandler.reportError(res, "Learning Object not found");
+
+            o.put("sid", sid);
+            o.put("pid", pid);
+            o.put("theme", theme);
+            o.put("type", type);
+            o.put("summary", summary);
+            o.put("desc", desc);
+            o.put("explain", explain);
+            o.put("keyword", keyword);
+            o.put("ref", ref);
+            m.updateObject(oid, o);
+
+            res.sendRedirect("edit.jsp?oid=" + oid + "&sid=" + sid + "&pid=" + pid);
+        }
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

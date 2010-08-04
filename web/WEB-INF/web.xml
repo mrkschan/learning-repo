@@ -28,6 +28,10 @@
         <servlet-name>Evaluation</servlet-name>
         <servlet-class>Evaluation</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>UpdateLearningObject</servlet-name>
+        <servlet-class>LearningObject</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>DefineTheme</servlet-name>
         <url-pattern>/define_theme</url-pattern>
@@ -55,6 +59,10 @@
     <servlet-mapping>
         <servlet-name>Evaluation</servlet-name>
         <url-pattern>/evaluate</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>UpdateLearningObject</servlet-name>
+        <url-pattern>/update_object</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

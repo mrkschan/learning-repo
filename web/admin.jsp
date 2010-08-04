@@ -4,7 +4,7 @@
 
 <%
     String admin = new Config().getConfig("admin");
-    if (false == admin.contains(USER)) response.sendRedirect("evil.html");
+    if (false == admin.contains(USER)) { response.sendRedirect("evil.html"); return; }
 %>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
