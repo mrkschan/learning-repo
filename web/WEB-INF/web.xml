@@ -32,6 +32,11 @@
         <servlet-name>UpdateLearningObject</servlet-name>
         <servlet-class>LearningObject</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>RESTDispatcher</servlet-name>
+        <servlet-class>restapi.RESTDispatcher</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
     <servlet-mapping>
         <servlet-name>DefineTheme</servlet-name>
         <url-pattern>/define_theme</url-pattern>
@@ -63,6 +68,10 @@
     <servlet-mapping>
         <servlet-name>UpdateLearningObject</servlet-name>
         <url-pattern>/update_object</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>RESTDispatcher</servlet-name>
+        <url-pattern>/restapi/*</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

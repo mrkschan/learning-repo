@@ -74,6 +74,7 @@
     <target name="-post-compile">
         <copy todir="build/web/WEB-INF/classes/config/">
             <fileset dir="./" includes="*config.properties"/>
+            <fileset dir="./" includes="keyword.yaml"/>
         </copy>
 
         <copy file="src/conf/ESAPI.properties" tofile="build/web/WEB-INF/classes/ESAPI.properties" />

@@ -7,7 +7,6 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.Mongo;
-import com.mongodb.ObjectId;
 import config.Config;
 import java.io.IOException;
 import java.util.Date;
@@ -17,6 +16,7 @@ import java.util.Map;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.bson.types.ObjectId;
 
 
 public class MongoController {
@@ -128,6 +128,8 @@ public class MongoController {
     private Map<String, Object> themeToMap(DBObject o) {
 
         Map<String, Object> hm = o.toMap();
+        
+        hm.put("_id", hm.get("_id").toString());
 
         BasicDBList k = (BasicDBList) hm.get("keyword");
         String[] keyword = (null == k)? null : new String[k.size()];
@@ -164,6 +166,8 @@ public class MongoController {
     }
 
     public void updateObject(String _id, Map<String, Object> object) {
+
+        object.put("_id", new ObjectId(_id));
 
         objects.update(
             new BasicDBObject("_id", new ObjectId(_id)),
@@ -211,6 +215,8 @@ public class MongoController {
 
         Map<String, Object> hm = o.toMap();
 
+        hm.put("_id", hm.get("_id").toString());
+
         BasicDBList k = (BasicDBList) hm.get("keyword");
         String[] keyword = (null == k)? null : new String[k.size()];
         if (null != keyword) k.toArray(keyword);
@@ -243,6 +249,8 @@ public class MongoController {
     }
 
     public void updateVote(String _id, Map<String, Object> vote) {
+
+        vote.put("_id", new ObjectId(_id));
 
         votes.update(
             new BasicDBObject("_id", new ObjectId(_id)),
@@ -287,7 +295,12 @@ public class MongoController {
     }
 
     private Map<String, Object> voteToMap(DBObject o) {
-        return o.toMap();
+
+        Map<String, Object> hm = o.toMap();
+
+        hm.put("_id", hm.get("_id").toString());
+
+        return hm;
     }
 
     public void saveView(String oid, String viewer) {
@@ -336,7 +349,12 @@ public class MongoController {
     }
 
     private Map<String, Object> viewToMap(DBObject o) {
-        return o.toMap();
+
+        Map<String, Object> hm = o.toMap();
+
+        hm.put("_id", hm.get("_id").toString());
+
+        return hm;
     }
 
     public long getViewCount(Map<String, Object> view) {
@@ -364,6 +382,8 @@ public class MongoController {
     }
 
     public void updateAnnotation(String _id, Map<String, Object> annotation) {
+
+        annotation.put("_id", new ObjectId(_id));
 
         annotations.update(
             new BasicDBObject("_id", new ObjectId(_id)),
@@ -408,7 +428,10 @@ public class MongoController {
     }
 
     private Map<String, Object> annotationToMap(DBObject o) {
+
         Map<String, Object> hm = o.toMap();
+
+        hm.put("_id", hm.get("_id").toString());
 
         BasicDBList k = (BasicDBList) hm.get("keyword");
         String[] keyword = (null == k)? null : new String[k.size()];
