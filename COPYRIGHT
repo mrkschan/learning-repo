@@ -140,3 +140,17 @@ For jQuery plugin - jTags:
 	The MIT License
 	Copyright (c) http://www.benoitvidis.com/2009/09/jtags-plugin/
 
+For Jersey RESTful Web Service:
+
+	CDDL v1.0
+	see https://jersey.dev.java.net/CDDL+GPL.html
+
+For SnakeYAML:
+
+	Apache License 2.0
+	see http://www.apache.org/licenses/LICENSE-2.0
+
+For Google Gson:
+
+	Apache License 2.0
+	see http://www.apache.org/licenses/LICENSE-2.0
