@@ -346,17 +346,16 @@
                         // click event of category box, show browser
                         // browser goes from hidden state to abstract state
                         // set content of abstract browser
-                        var el = $('div.topics', this).first(),
-                            ary = $('a', el).toArray();
 
                         // clone category header to abstract browser
                         $('div.category').append($('div.header', this).clone());
 
                         // create topic listing of category in abstract browser
+                        if (console) console.debug(this.topics);
                         var ul = $('<ul/>', {'class': 'listing'});
-                        for (var i in ary) {
+                        for (var i in this.topics) {
                             $(ul).append(
-                                $('<li/>', {html: $(ary[i]).clone()})
+                                $('<li/>', {html: $(this.topics[i]).clone()})
                             );
                         }
                         $('div.category').append($('<div/>', {html: $(ul)}));
@@ -529,11 +528,12 @@
                 // onready:
                 // init category box, create browser
                 $(document).ready(function () {
+
                     $('li.category').each(function(idx, li) {
                         var el = $('div.topics', this).first(),
                             ary = $('a', el).toArray();
 
-                        if (0 == ary.length) return; // skip search box
+                        li.topics = $('a', el).clone().toArray();
 
                         // random sort
                         ary.sort(function() {return (Math.round(Math.random())-0.5);});
