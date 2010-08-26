@@ -74,6 +74,7 @@ public class RestAPI {
                 q.put("keyword", Pattern.compile(t, Pattern.CASE_INSENSITIVE));
                 hm.put(t, m.queryObject(q));
             }
+
             return new Gson().toJson(hm);
 
         } catch (IOException ex) {
@@ -93,12 +94,31 @@ public class RestAPI {
         try {
             MongoController m = new MongoController();
 
-            HashMap<String, Object> hm = new HashMap<String, Object>();
-
-            Map<String, Object> q= new HashMap<String, Object>();
+            Map<String, Object> q = new HashMap<String, Object>();
             q.put("keyword", Pattern.compile(keyword, Pattern.CASE_INSENSITIVE));
-            hm.put(keyword, m.queryObject(q));
-            return new Gson().toJson(hm);
+
+            return new Gson().toJson(m.queryObject(q));
+
+        } catch (IOException ex) {
+            return "{\"error\": 1}";
+        }
+    }
+
+    /**
+     * Get learning object by id
+     */
+    @GET
+    @Path("learning_objects/object/{oid}")
+    @Produces("application/json")
+    public String getLearningObjectById(@PathParam("oid") String oid) {
+
+        try {
+            MongoController m = new MongoController();
+
+            Map<String, Object> q = new HashMap<String, Object>();
+            q.put("_id", oid);
+            
+            return new Gson().toJson(m.getObject(q));
 
         } catch (IOException ex) {
             return "{\"error\": 1}";

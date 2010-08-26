@@ -80,29 +80,99 @@
             height: 600px;
         }
 
-        div.exit {
+        div.browser div.exit {
             float: right;
         }
 
-        div.exit a {
+        div.browser div.exit a {
             text-decoration: none;
             color: #3366cc;
         }
-        div.exit a:hover {
+        div.browser div.exit a:hover {
             color: #c33;
         }
 
-        div.category {
+        div.browser div.abstract {
+            display: block;
+        }
+
+        div.browser div.abstract div.category {
             float: left;
-            width: 300px;
+            width: 30%;
+            height: 590px;
+        }
+
+        div.browser div.abstract div.list {
+            float: left;
+            width: 67%;
+            height: 590px;
+            padding: 5px 5px 5px 5px;
+        }
+
+        div.browser div.abstract div.list div.content {
+            overflow-y: auto;
             height: 100%;
         }
 
-        div.list {
-            float: left;
-            width: 600px;
-            height: 100%;
+        div.browser div.abstract div.list div.content div.summary {
+            font-weight: bold;
         }
+
+        div.browser div.abstract div.list div.content ul {
+            margin-left: 0px;
+            padding-left: 0px;
+        }
+
+        div.browser div.abstract div.list div.content ul li {
+            list-style: none;
+            border: 1px solid #cccccc;
+            margin: 5px 5px 5px 5px;
+            padding: 5px 5px 5px 5px;
+            cursor: pointer;
+        }
+
+        div.browser div.detail {
+            display: none;
+        }
+
+        div.browser div.detail div.to_abstract {
+            float: left;
+            height: 590px;
+            border: 1px solid #cccccc;
+            margin-right: 3px;
+            padding-left: 2px;
+            padding-right: 2px;
+            cursor: pointer;
+        }
+
+        div.browser div.detail div.to_abstract div {
+            position: relative;
+            top: 300px;
+        }
+
+        div.browser div.detail div.external {
+            float: left;
+            height: 590px;
+            width: 70%;
+        }
+
+        div.external iframe {
+            width: 100%;
+            height: 100%;
+            border: 0px;
+        }
+
+        div.browser div.detail div.metadata {
+            float: left;
+            height: 590px;
+            width: 20%;
+            padding: 5px 5px 5px 5px;
+        }
+
+        div.template {
+            display: none;
+        }
+
 
         ul.listing {
             margin: 0 0 0 0;
@@ -142,7 +212,7 @@
             border-bottom: 1px solid #eeeeee;
         }
 
-        div.topics{
+        div.topics {
             height: 80px;
             overflow: hidden;
             padding-top: 5px;
@@ -160,8 +230,35 @@
         <div class="overlay"></div>
         <div class="container browser">
             <div class="exit"><a href="#">[x]</a></div>
-            <div class="category"></div>
-            <div class="list"></div>
+            <div class="abstract">
+                <div class="category"></div>
+                <div class="list">
+                    <div class="loading">Loading ...</div>
+                    <div class="content"></div>
+                </div>
+            </div>
+            <div class="detail">
+                <div class="to_abstract"><div> <a href="#">&lt;&lt;</a> </div></div>
+                <div class="external"><iframe src="data:text/html;charset=utf-8,Loading..."></iframe></div>
+                <div class="metadata">
+                        <div class="summary"></div>
+                        <div class="keyword"></div>
+                        <div class="desc"></div>
+                        <div class="explain"></div>
+                        <div class="ref"></div>
+                </div>
+            </div>
+        </div>
+        <div class="template">
+            <ul>
+                <li class="thumbnail">
+                    <div class="to_detail" style="float:right"> <a href="#">&gt;&gt;</a> </div>
+                    <div class="preview">
+                        <div class="summary"></div>
+                        <div class="keyword"></div>
+                    </div>
+                </li>
+            </ul>
         </div>
         <div class="container">
             <fieldset>
@@ -193,30 +290,314 @@
         </div>
 
         <script type="text/javascript">
+            (function ($) {
+
+                // TODO
+                /*
+                 * resize from big to small, overlay not covering much
+                 */
+
+                // learning object browser
+                Browser = function() {
+                    var _this = this;
+                    _this.state = null;
+
+                    this.setState = function(s) {
+                        _this.state = s;
+                        _this.state.enter(_this);
+                    }
+
+                    this.toggle = function() {
+                        _this.state.toggle(_this);
+                    }
+
+                    this.exit = function() {
+                        _this.state.exit(_this);
+                    }
+
+                    this.resize = function() {
+                        _this.state.resize(_this);
+                    }
+
+                    this.setState(new Browser.hidden_state());
+                    return this;
+                };
+
+                // learning object browser - hidden state
+                Browser.hidden_state = function() {
+                    this.enter = function(browser) {
+                        $('div.overlay, div.browser').hide();
+                    }
+                    this.toggle = function(browser) {
+                        // do nothing
+                    }
+                    this.exit = function(browser) {
+                        $('div.overlay').css({
+                            width: $(window).width(),
+                            height: $(window).height()
+                        });
+                        $('div.overlay, div.browser').show();
+                        
+                        browser.setState(new Browser.abstract_state());
+                    }
+                    this.resize = function(browser) {
+                        // do nothing
+                    }
+                    return this;
+                };
+
+                // learning object browser - abstract state
+                Browser.abstract_state = function() {
+                    this.enter = function(browser) {
+                        $('div.browser').css({
+                            top: 50,
+                            width: $(window).width() - 300,
+                            left: 150
+                        });
+                        $('div.browser div.abstract').show();
+                    }
+                    this.toggle = function(browser) {
+                        $('div.browser div.abstract').hide();
+
+                        browser.setState(new Browser.detail_state());
+                    }
+                    this.exit = function(browser) {
+                        $('div.category, div.list div.content', $('div.browser')).empty();
+                        $('div.list div.loading').show();
+
+                        browser.setState(new Browser.hidden_state());
+                    }
+                    this.resize = function(browser) {
+                        $('div.overlay').css({
+                            width: $(window).width(),
+                            height: $(window).height()
+                        });
+                        $('div.browser').css({
+                            width: $(window).width() - 300
+                        });
+                    }
+                    return this;
+                };
+
+                // learning object browser - detail state
+                Browser.detail_state = function() {
+                    this.enter = function(browser) {
+                        $('div.browser').css({
+                            width: $(window).width() - 20,
+                            left: 5
+                        });
+                        $('div.browser div.detail').show();
+                    }
+                    this.toggle = function(browser) {
+                        $('div.external iframe').attr('src', 'data:text/html;charset=utf-8,Loading...');
+                        $('div.browser div.detail').hide();
+
+                        browser.setState(new Browser.abstract_state());
+                    }
+                    this.exit = function(browser) {
+                        $('div.external iframe').attr('src', 'data:text/html;charset=utf-8,Loading...');
+
+                        $('div.category, div.list div.content', $('div.browser')).empty();
+                        $('div.list div.loading').show();
+                        $('div.browser div.detail').hide();
+                        
+                        browser.setState(new Browser.hidden_state());
+                    }
+                    this.resize = function(browser) {
+                        $('div.overlay').css({
+                            width: $(window).width(),
+                            height: $(window).height()
+                        });
+                        $('div.browser').css({
+                            width: $(window).width() - 20
+                        });
+                    }
+                    return this;
+                };
+
+                $(document).ready(function () {
+                    var browser = new Browser();
+
+                    $(window).resize(function() { browser.resize() });
+
+                    // exit browser
+                    $('div.overlay, div.exit a').click(function () {
+                        browser.exit();  // exit current state
+                    });
+                    
+                    // from detail browser to abstract browser
+                    $('div.to_abstract').click(function () {
+                        browser.toggle();
+                    });
+
+                    // from abstract browser to detial browser
+                    $('li.thumbnail').live('click', function() {
+                        browser.toggle();
+
+                        // retrieve learning object data
+                        $.getJSON(
+                            'restapi/learning_objects/object/' + $(this).attr('oid'),
+                            function(r) {
+                                $('div.external iframe').attr('src', r['ref'][0]);
+                            }
+                        );
+                    });
+
+                    // init category box
+                    $('li.category').each(function(idx, li) {
+                        var el = $('div.topics', this).first(),
+                            ary = $('a', el).toArray();
+
+                        if (0 == ary.length) return; // skip search box
+
+                        // random sort
+                        ary.sort(function() {return (Math.round(Math.random())-0.5);});
+                        $(el).html($(ary));
+
+                        // prevent topic list too long
+                        while (el.clientHeight != el.scrollHeight) {
+                            ary.pop();
+                            $(el).html($(ary));
+                        }
+
+                        // click event of category box
+                        // browser goes from hidden state to abstract state
+                        // set content of abstract state
+                        $(li).click(function() {
+                            $('div.category').append($('div.header', this).clone());
+
+                            // create topic listing of category
+                            var ul = $('<ul/>', {class: 'listing'});
+                            for (var i in ary) {
+                                $(ul).append(
+                                    $('<li/>', {html: $(ary[i]).clone()})
+                                );
+                            }
+                            $('div.category').append($('<div/>', {html: $(ul)}));
+
+                            // create learning object listing
+                            $('div.list div.loading').show();
+                            $.getJSON(
+                                'restapi/learning_objects/category/' + $('h4', this).html(),
+                                function(topics) {
+                                    $('div.list div.loading').hide();
+
+                                    var list = $('<ul/>'), unique = [];
+                                    for (var i in topics) {
+                                        var objects = $.makeArray(topics[i]);
+
+                                        for (var j in objects) {
+                                            var o = objects[j];
+
+                                            if (-1 < $.inArray(o['_id'], unique)) continue;
+                                            unique.push(o['_id']);
+
+                                            var li = $('.template .thumbnail').clone();
+                                            $('.preview .summary', li).html(o['summary']);
+                                            $('.preview .keyword', li).html(o['keyword'].join(', '));
+                                            $(li).attr('oid', o['_id']);
+
+                                            list.append(li);
+                                        }
+                                    }
+
+                                    if (0 == unique.length) {
+                                        $('div.list div.content').html('No Learning Object found.');
+                                    } else {
+                                        $('div.list div.content').append(list);
+                                    }
+                                }
+                            );
+                            browser.exit();
+                        });
+                    });
+                    
+                });
+            })(jQuery);
+
+
+
+            // obsolete
+/*
             $(document).ready(function () {
+
+                var browser_style;
 
                 function stylize_overlay() {
                     $('div.overlay').css('width', $(window).width());
                     $('div.overlay').css('height', $(window).height());
                 }
 
-                function stylize_browser() {
-                    $('div.browser').css('top', 50);
-                    $('div.browser').css('left', ($(window).width() - $('div.browser').width()) / 2);
+                function stylize_browser(s) {
+                    if (null != s && undefined != s) browser_style = s;
+                    
+                    if ('max' == browser_style) {
+                        $('div.browser').css({
+                            width: $(window).width() - 20,
+                            left: 5
+                        });
+                    } else {
+                        $('div.browser').css({
+                            top: 50,
+                            width: $(window).width() - 300,
+                            left: 150
+                        });
+                    }
                 }
 
                 function clearup_overlay() {
-                    $('div.overlay').hide();
-                    $('div.category, div.list', $('div.browser')).empty();
+                    stylize_browser('');
+
                     $('div.browser').hide();
+                    $('div.browser div.detail').hide();
+                    $('div.overlay').hide();
+
+                    $('div.category, div.list div.content', $('div.browser')).empty();
+                    $('div.external iframe').unbind();
+                    $('div.external iframe').attr('src', '');
+                    $('div.external iframe').hide();
+
+                    
+                    $('div.browser div.abstract').show();
                 }
 
+                $(window).resize(function() {
+                    if ($('div.overlay').is(":visible")) {
+                        stylize_overlay();
+                        stylize_browser();
+                    }
+                });
+
+                // exit overlay
                 $('div.overlay').click(function () {
                     clearup_overlay();
                 });
                 $('div.exit a').click(function() {
                     clearup_overlay();
                     return false;
+                });
+
+                // go back category from learning object
+                $('div.to_abstract').click(function () {
+                    $('div.browser div.abstract').show();
+                    $('div.browser div.detail').hide();
+
+                    $('div.external iframe').attr('src', 'data:text/html;charset=utf-8,Loading...');
+                    stylize_browser('');
+                });
+
+                // show learning object
+                $('li.thumbnail').live('click', function() {
+                    $('div.browser div.abstract').hide();
+                    $('div.browser div.detail').show();
+
+                    $.getJSON(
+                        'restapi/learning_objects/object/' + $(this).attr('oid'),
+                        function(r) {                            
+                            $('div.external iframe').attr('src', r['ref'][0]);
+                            stylize_browser('max');
+                        }
+                    );
                 });
 
                 $('li.category').each(function(idx, li) {
@@ -235,7 +616,7 @@
                         $(el).html($(ary));
                     }
 
-                    // click event
+                    // click event, show category
                     $(li).click(function() {
                         $('div.category').append($('div.header', this).clone());
 
@@ -247,19 +628,46 @@
                         }
                         $('div.category').append($('<div/>', {html: $(ul)}));
 
+                        $('div.list div.loading').show();
+                        $.getJSON(
+                            'restapi/learning_objects/category/' + $('h4', this).html(),
+                            function(topics) {
+                                $('div.list div.loading').hide();
+
+                                var list = $('<ul/>'), unique = [];
+                                for (var i in topics) {
+                                    var objects = $.makeArray(topics[i]);
+
+                                    for (var j in objects) {
+                                        var o = objects[j];
+                                        
+                                        if (-1 < $.inArray(o['_id'], unique)) continue;
+                                        unique.push(o['_id']);
+
+                                        var li = $('.template .thumbnail').clone();
+                                        $('.preview .summary', li).html(o['summary']);
+                                        $('.preview .keyword', li).html(o['keyword'].join(', '));
+                                        $(li).attr('oid', o['_id']);
+
+                                        list.append(li);
+                                    }
+                                }
+
+                                if (0 == unique.length) {
+                                    $('div.list div.content').html('No Learning Object found.');
+                                } else {
+                                    $('div.list div.content').append(list);
+                                }
+                            }
+                        );
+
                         stylize_overlay();
-                        stylize_browser();
+                        stylize_browser('');
                         $('div.overlay, div.browser').show();
                     });
                 });
-
-                $(window).resize(function() {
-                    if ($('div.overlay').is(":visible")) {
-                        stylize_overlay();
-                        stylize_browser();
-                    }
-                });
             });
+*/
         </script>
 
     </body>
