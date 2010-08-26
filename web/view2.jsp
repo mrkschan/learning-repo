@@ -292,9 +292,9 @@
         <script type="text/javascript">
             (function ($) {
 
-                // TODO
                 /*
-                 * resize from big to small, overlay not covering much
+                 * TODO:
+                 * - resize from big to small, overlay not covering much
                  */
 
                 // learning object browser
@@ -307,19 +307,114 @@
                         _this.state.enter(_this);
                     }
 
-                    this.toggle = function() {
-                        _this.state.toggle(_this);
+                    this.roll = function() {
+                        _this.state.roll(_this);
                     }
 
-                    this.exit = function() {
-                        _this.state.exit(_this);
+                    this.paint = function() {
+                        _this.state.paint(_this);
                     }
 
                     this.resize = function() {
                         _this.state.resize(_this);
                     }
 
-                    this.setState(new Browser.hidden_state());
+                    this.loaded = function() {
+                        _this.state.loaded(_this);
+                    }
+                    
+                    //--- init browser ---//
+                    $(window).resize(function() {
+                        // browser resize when window resize
+                        _this.resize();
+                    });
+
+                    $('div.overlay, div.exit a').click(function () {
+                        // exit browser event
+                        // repaint browser
+                        _this.paint();
+                    });
+
+                    $('div.to_abstract').click(function () {
+                        // to abstract browser button click event
+                        // $('div.to_abstract') can only be clicked in detail state
+                        // toggle from detail state to abstract state
+                        _this.roll();
+                    });
+
+                    $('li.category').click(function() {
+                        // click event of category box, show browser
+                        // browser goes from hidden state to abstract state
+                        // set content of abstract browser
+                        var el = $('div.topics', this).first(),
+                            ary = $('a', el).toArray();
+
+                        // clone category header to abstract browser
+                        $('div.category').append($('div.header', this).clone());
+
+                        // create topic listing of category in abstract browser
+                        var ul = $('<ul/>', {'class': 'listing'});
+                        for (var i in ary) {
+                            $(ul).append(
+                                $('<li/>', {html: $(ary[i]).clone()})
+                            );
+                        }
+                        $('div.category').append($('<div/>', {html: $(ul)}));
+
+                        // create learning object listing in abstract browser
+                        $.getJSON(
+                            'restapi/learning_objects/category/' + $('h4', this).html(),
+                            function(topics) {
+                                _this.loaded();
+
+                                var list = $('<ul/>'), unique = [];
+                                for (var i in topics) {
+                                    var objects = $.makeArray(topics[i]);
+
+                                    for (var j in objects) {
+                                        var o = objects[j];
+
+                                        if (-1 < $.inArray(o['_id'], unique)) continue;
+                                        unique.push(o['_id']);
+
+                                        var li = $('.template .thumbnail').clone();
+                                        $('.preview .summary', li).html(o['summary']);
+                                        $('.preview .keyword', li).html(o['keyword'].join(', '));
+                                        $(li).attr('oid', o['_id']);
+
+                                        list.append(li);
+                                    }
+                                }
+
+                                if (0 == unique.length) {
+                                    $('div.list div.content').html('No Learning Object found.');
+                                } else {
+                                    $('div.list div.content').append(list);
+                                }
+                            }
+                        );
+
+                        _this.paint(); // repaint browser, enter abstract state
+                    });
+
+                    $('div.list li.thumbnail').live('click', function() {
+                        // to learning object detail button click event
+                        // $('li.thumbnail') can only be clicked in abstrate state
+                        // toggle from abstract state to detail state
+                        _this.roll();
+
+                        // retrieve learning object data
+                        // fill data to detail browser
+                        $.getJSON(
+                            'restapi/learning_objects/object/' + $(this).attr('oid'),
+                            function(r) {
+                                $('div.external iframe').attr('src', r['ref'][0]);
+                            }
+                        );
+                    });
+
+                    this.setState(new Browser.hidden_state()); // default hidden state
+
                     return this;
                 };
 
@@ -328,10 +423,12 @@
                     this.enter = function(browser) {
                         $('div.overlay, div.browser').hide();
                     }
-                    this.toggle = function(browser) {
+                    this.roll = function(browser) {
                         // do nothing
                     }
-                    this.exit = function(browser) {
+                    this.paint = function(browser) {
+                        // when repaint in hidden state
+                        // browser is shown
                         $('div.overlay').css({
                             width: $(window).width(),
                             height: $(window).height()
@@ -341,6 +438,9 @@
                         browser.setState(new Browser.abstract_state());
                     }
                     this.resize = function(browser) {
+                        // do nothing
+                    }
+                    this.loaded = function(browser) {
                         // do nothing
                     }
                     return this;
@@ -356,12 +456,14 @@
                         });
                         $('div.browser div.abstract').show();
                     }
-                    this.toggle = function(browser) {
+                    this.roll = function(browser) {
                         $('div.browser div.abstract').hide();
 
                         browser.setState(new Browser.detail_state());
                     }
-                    this.exit = function(browser) {
+                    this.paint = function(browser) {
+                        // when repaint in abstrate state
+                        // browser is hidden indeed
                         $('div.category, div.list div.content', $('div.browser')).empty();
                         $('div.list div.loading').show();
 
@@ -376,6 +478,9 @@
                             width: $(window).width() - 300
                         });
                     }
+                    this.loaded = function(browser) {
+                        $('div.list div.loading').hide();
+                    }
                     return this;
                 };
 
@@ -388,13 +493,15 @@
                         });
                         $('div.browser div.detail').show();
                     }
-                    this.toggle = function(browser) {
+                    this.roll = function(browser) {
                         $('div.external iframe').attr('src', 'data:text/html;charset=utf-8,Loading...');
                         $('div.browser div.detail').hide();
 
                         browser.setState(new Browser.abstract_state());
                     }
-                    this.exit = function(browser) {
+                    this.paint = function(browser) {
+                        // when repaint in detail state
+                        // browser is hidden indeed
                         $('div.external iframe').attr('src', 'data:text/html;charset=utf-8,Loading...');
 
                         $('div.category, div.list div.content', $('div.browser')).empty();
@@ -412,38 +519,16 @@
                             width: $(window).width() - 20
                         });
                     }
+                    this.loaded = function(browser) {
+                        // do nothing
+                    }
                     return this;
                 };
 
+
+                // onready:
+                // init category box, create browser
                 $(document).ready(function () {
-                    var browser = new Browser();
-
-                    $(window).resize(function() { browser.resize() });
-
-                    // exit browser
-                    $('div.overlay, div.exit a').click(function () {
-                        browser.exit();  // exit current state
-                    });
-                    
-                    // from detail browser to abstract browser
-                    $('div.to_abstract').click(function () {
-                        browser.toggle();
-                    });
-
-                    // from abstract browser to detial browser
-                    $('li.thumbnail').live('click', function() {
-                        browser.toggle();
-
-                        // retrieve learning object data
-                        $.getJSON(
-                            'restapi/learning_objects/object/' + $(this).attr('oid'),
-                            function(r) {
-                                $('div.external iframe').attr('src', r['ref'][0]);
-                            }
-                        );
-                    });
-
-                    // init category box
                     $('li.category').each(function(idx, li) {
                         var el = $('div.topics', this).first(),
                             ary = $('a', el).toArray();
@@ -459,59 +544,9 @@
                             ary.pop();
                             $(el).html($(ary));
                         }
-
-                        // click event of category box
-                        // browser goes from hidden state to abstract state
-                        // set content of abstract state
-                        $(li).click(function() {
-                            $('div.category').append($('div.header', this).clone());
-
-                            // create topic listing of category
-                            var ul = $('<ul/>', {class: 'listing'});
-                            for (var i in ary) {
-                                $(ul).append(
-                                    $('<li/>', {html: $(ary[i]).clone()})
-                                );
-                            }
-                            $('div.category').append($('<div/>', {html: $(ul)}));
-
-                            // create learning object listing
-                            $('div.list div.loading').show();
-                            $.getJSON(
-                                'restapi/learning_objects/category/' + $('h4', this).html(),
-                                function(topics) {
-                                    $('div.list div.loading').hide();
-
-                                    var list = $('<ul/>'), unique = [];
-                                    for (var i in topics) {
-                                        var objects = $.makeArray(topics[i]);
-
-                                        for (var j in objects) {
-                                            var o = objects[j];
-
-                                            if (-1 < $.inArray(o['_id'], unique)) continue;
-                                            unique.push(o['_id']);
-
-                                            var li = $('.template .thumbnail').clone();
-                                            $('.preview .summary', li).html(o['summary']);
-                                            $('.preview .keyword', li).html(o['keyword'].join(', '));
-                                            $(li).attr('oid', o['_id']);
-
-                                            list.append(li);
-                                        }
-                                    }
-
-                                    if (0 == unique.length) {
-                                        $('div.list div.content').html('No Learning Object found.');
-                                    } else {
-                                        $('div.list div.content').append(list);
-                                    }
-                                }
-                            );
-                            browser.exit();
-                        });
                     });
-                    
+
+                    new Browser();
                 });
             })(jQuery);
 
