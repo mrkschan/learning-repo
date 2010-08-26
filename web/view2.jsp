@@ -125,7 +125,7 @@
 
         div.browser div.abstract div.list div.content ul li {
             list-style: none;
-            border: 1px solid #cccccc;
+            border: 1px solid #8496ba;
             margin: 5px 5px 5px 5px;
             padding: 5px 5px 5px 5px;
             cursor: pointer;
@@ -138,10 +138,10 @@
         div.browser div.detail div.to_abstract {
             float: left;
             height: 590px;
-            border: 1px solid #cccccc;
+            border: 1px solid #8496ba;
             margin-right: 3px;
-            padding-left: 2px;
-            padding-right: 2px;
+            padding-left: 1px;
+            padding-right: 1px;
             cursor: pointer;
         }
 
@@ -165,8 +165,24 @@
         div.browser div.detail div.metadata {
             float: left;
             height: 590px;
-            width: 20%;
+            width: 26%;
             padding: 5px 5px 5px 5px;
+            overflow-y: auto;
+        }
+
+        div.browser div.detail div.metadata div {
+            white-space: wrap;
+            padding-left: 10px;
+            border: 1px solid #8496ba;
+        }
+
+        div.browser div.detail div.metadata div.ref {
+            border: 0px;
+        }
+
+        div.browser div.detail div.metadata div ul {
+            margin: 0 0 0 0;
+            padding-left: 0px;
         }
 
         div.template {
@@ -241,11 +257,16 @@
                 <div class="to_abstract"><div> <a href="#">&lt;&lt;</a> </div></div>
                 <div class="external"><iframe src="data:text/html;charset=utf-8,Loading..."></iframe></div>
                 <div class="metadata">
-                        <div class="summary"></div>
-                        <div class="keyword"></div>
-                        <div class="desc"></div>
-                        <div class="explain"></div>
-                        <div class="ref"></div>
+                    <label>Summary:</label>
+                    <div class="summary"></div>
+                    <label>Keyword:</label>
+                    <div class="keyword"></div>
+                    <label>Content Description:</label>
+                    <div class="desc"></div>
+                    <label>Explanation of Concepts:</label>
+                    <div class="explain"></div>
+                    <label>References:</label>
+                    <div class="ref"></div>
                 </div>
             </div>
         </div>
@@ -351,7 +372,6 @@
                         $('div.category').append($('div.header', this).clone());
 
                         // create topic listing of category in abstract browser
-                        if (console) console.debug(this.topics);
                         var ul = $('<ul/>', {'class': 'listing'});
                         for (var i in this.topics) {
                             $(ul).append(
@@ -408,6 +428,19 @@
                             'restapi/learning_objects/object/' + $(this).attr('oid'),
                             function(r) {
                                 $('div.external iframe').attr('src', r['ref'][0]);
+                                $('div.metadata div.summary').html(r['summary']);
+                                $('div.metadata div.keyword').html(r['keyword'].join(', '));
+                                $('div.metadata div.desc').html(r['desc']);
+                                $('div.metadata div.explain').html(r['explain']);
+
+                                var ul = $('<ul/>'), href, container = $('div.metadata');
+                                for (var i in r['ref']) {
+                                    href = r['ref'][i];
+                                    ul.append($('<li/>', {
+                                        html: '<a href="' + href + '">' + r['ref'][i] + '</a>'
+                                    }));
+                                }
+                                $('div.metadata div.ref').html(ul);
                             }
                         );
                     });
