@@ -154,6 +154,7 @@
             float: left;
             height: 590px;
             width: 70%;
+            border: 1px solid #8496ba;
         }
 
         div.external iframe {
@@ -165,7 +166,7 @@
         div.browser div.detail div.metadata {
             float: left;
             height: 590px;
-            width: 26%;
+            width: 25%;
             padding: 5px 5px 5px 5px;
             overflow-y: auto;
         }
