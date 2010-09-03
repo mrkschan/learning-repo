@@ -8,7 +8,7 @@
  *
  *
  * MODIFIED: keyup, keydown, keyleft, keyright,
- *           keypageup, keypagedown, hintText, dropdown box style
+ *           keypageup, keypagedown, hintText, dropdown box style, init_list
  */
 
 (function($) {
@@ -285,24 +285,12 @@ $.TokenList = function (input, settings) {
         li_data = settings.prePopulate;
         if(li_data && li_data.length) {
             for(var i in li_data) {
-                var this_token = $("<li><p>"+li_data[i].name+"</p> </li>")
-                    .addClass(settings.classes.token)
-                    .insertBefore(input_token);
-
-                $("<span>x</span>")
-                    .addClass(settings.classes.tokenDelete)
-                    .appendTo(this_token)
-                    .click(function () {
-                        delete_token($(this).parent());
-                        return false;
-                    });
+                var this_token = insert_token(li_data[i].id, li_data[i].name);
 
                 $.data(this_token.get(0), "tokeninput", {"id": li_data[i].id, "name": li_data[i].name});
 
                 // Clear input box and make sure it keeps focus
-                input_box
-                    .val("")
-                    .focus();
+                input_box.val("");
 
                 // Don't show the help dropdown, they've got the idea
                 hide_dropdown();
