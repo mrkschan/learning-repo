@@ -18,24 +18,23 @@
 <!-- jQuery-plugin: validate v1.6 settings -->
 <!-- http://bassistance.de/jquery-plugins/jquery-plugin-validation/ -->
         <script type="text/javascript" src="validate/jquery.validate.js"></script>
+
+<!-- jQuery-plugin: tokeninput v1.1 settings -->
+<!-- http://loopj.com/2009/04/25/jquery-plugin-tokenizing-autocomplete-text-entry/ -->
+        <script type="text/javascript" src="tokeninput/jquery.tokeninput.js"></script>
+        <link rel="stylesheet" href="tokeninput/token-input-facebook.css" type="text/css">
+
+        <style type="text/css">
+            div.success {
+                display: none;
+            }
+        </style>
+
     </head>
     <body>
         <div class="container">
-            <div>
-<script type="text/javascript">
-
-    var param = window.location.search.replace('?', '').split('&');
-    var _sid = null, _pid = null, p;
-    for (var idx in param) {
-        p = param[idx];
-        if (-1 != p.indexOf("sid")) _sid = p.split('=').pop();
-        if (-1 != p.indexOf("pid")) _pid = p.split('=').pop();
-    }
-
-    if (null != _sid && null != _pid) {
-        document.write('<p class="success">Learning Object Submitted!</p>');
-    }
-</script>
+            <div class="success">
+                <p>Learning Object Submitted!</p>
             </div>
             <form id="f" action="submit_object" method="post">
                 <fieldset>
@@ -47,64 +46,21 @@
                     <div>
                         <p>
                             <label for="sid">Student ID:</label>
-                            <input type="text" id="sid" name="sid" maxlength="8" />
+                            <input type="text" id="sid" name="sid" maxlength="8" value="<% out.print(USER); %>" />
                             &nbsp;&nbsp;&nbsp;
                             <label for="pid">Partner's Student ID:</label>
                             <input type="text" id="pid" name="pid" maxlength="8" />
                         </p>
-<script type="text/javascript">
-    if (null != _sid) $("#sid").val(unescape(_sid));
-    if (null != _pid) $("#pid").val(unescape(_pid));
-</script>
-                    </div>
-                    <div>
-                        <label for="theme">Theme:</label>
-                        <select id="theme" name="theme" onchange="refresh_pool()">
-<%
-    MongoController m = new MongoController();
-
-    List<Map<String, Object>> dump = m.dumpTheme();
-
-    if (null != dump) {
-        for (Map<String, Object> _m : dump) {
-            out.println("<option value=\"" + _m.get("name") + "\">" + _m.get("name") + "</option>");
-        }
-    }
-%>
-                        </select>
-<script type="text/javascript">
-    var _pool = {};
-<%
-    if (null != dump) {
-        String ary, name;
-        String[] keyword;
-        for (Map<String, Object> _m : dump) {
-            keyword = (String[]) _m.get("keyword");
-            name    = (String) _m.get("name");
-            name    = name.replaceAll(" ", "_");
-
-            ary = "[";
-            for (int i = 0; null != keyword && i < keyword.length; ++i) {
-                if (0 == i) ary += '"' + keyword[i] + '"';
-                else        ary += "," + '"' + keyword[i] + '"';
-            }
-            ary += ']';
-            out.println("_pool." + name + '=' + ary + ';');
-        }
-    }
-%>
-    function refresh_pool() {
-        var _tv = $("#theme").val().replace(/ /g, '_');
-        if (_tv.length > 0) {
-            $("#pool").html(_pool[_tv].join(', '));
-        }
-    }
-</script>
                     </div>
                     <div>
                         <label>One-line Short Summary: (less than 100 characters)</label>
                         <br />
                         <input type="text" id="summary" name="summary" size="80" maxlength="100" />
+                    </div>
+                    <div>
+                        <label for="keyword">Keywords:</label>
+                        <br />
+                        <input type="text" id="keyword" name="keyword" size="70" />
                     </div>
                     <div>
                         <label>Media Type:</label>
@@ -122,42 +78,20 @@
                     <div>
                         <label>Content Description:</label>
                         <br />
-                        <textarea id="desc" name="desc" cols="60" rows="10"></textarea>
+                        <textarea id="desc" name="desc" cols="50" rows="10"></textarea>
                     </div>
                     <div>
                         <label>Explanation of Concepts:</label>
                         <br />
-                        <textarea id="explain" name="explain" cols="60" rows="10"></textarea>
-                    </div>
-                    <div>
-                        <label for="keyword">Keywords (Comma Separated Value):</label>
-                        <br />
-                        [<i>Suggested: <span id="pool"></span></i>]
-                        <br />
-                        <input type="text" id="keyword" name="keyword" size="70" />
-<script type="text/javascript">refresh_pool();</script>
+                        <textarea id="explain" name="explain" cols="50" rows="10"></textarea>
                     </div>
                     <div>
                         <label for="ref">Any Reference of the Object: (http/https, ftp/ftps)</label>
-                        <a href="#" class="trigger" onclick="add_ref()">(Add reference line)</a>
+                        <a href="#" class="trigger">(Add reference line)</a>
                         <br />
                         <div id="ref_container">
                             <input type="text" name="ref" size="80" style="margin-bottom: 2px" /><br/>
                         </div>
-<script type="text/javascript">
-    function add_ref() {
-        var input = document.createElement("input");
-        input.type = "text";
-        input.name = "ref";
-        input.size = 80;
-        input.style.margin_bottom = '2px';
-        var br = document.createElement("br");
-
-        var c = document.getElementById("ref_container");
-        c.appendChild(input);
-        c.appendChild(br);
-    }
-</script>
                     </div>
                     <div>
                         <button class="button positive">Submit</button>
@@ -167,6 +101,45 @@
             </form>
 <script type="text/javascript">
     $().ready(function() {
+
+        var param = window.location.search.replace('?', '').split('&');
+        var _sid = null, _pid = null, p;
+        for (var idx in param) {
+            p = param[idx];
+            if (-1 != p.indexOf("sid")) _sid = p.split('=').pop();
+            if (-1 != p.indexOf("pid")) _pid = p.split('=').pop();
+        }
+
+        if (null != _sid && null != _pid) $('.success').show();
+        if (null != _pid) $("#pid").val(unescape(_pid));
+
+        $('.trigger').click(function() {
+            $('#ref_container')
+                .append($('<input />', {
+                    type: 'text',
+                    name: 'ref',
+                    size: 80,
+                    style: 'margin-bottom: 2px'
+                }))
+                .append($('<br />'));
+            return false;
+        });
+
+        $('#keyword').tokenInput('restapi/topics', {
+            classes: {
+                tokenList: "token-input-list-facebook",
+                token: "token-input-token-facebook",
+                tokenDelete: "token-input-delete-token-facebook",
+                selectedToken: "token-input-selected-token-facebook",
+                highlightedToken: "token-input-highlighted-token-facebook",
+                dropdown: "token-input-dropdown-facebook",
+                dropdownItem: "token-input-dropdown-item-facebook",
+                dropdownItem2: "token-input-dropdown-item2-facebook",
+                selectedDropdownItem: "token-input-selected-dropdown-item-facebook",
+                inputToken: "token-input-input-token-facebook"
+            }
+        });
+
         $('#f').validate({
             rules: {
                 sid: {required: true, digits: true, minlength: 8, maxlength: 8},

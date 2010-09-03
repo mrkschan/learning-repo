@@ -191,7 +191,7 @@
                     <ul id="listing">
 <%
     SimpleDateFormat df = new SimpleDateFormat("MMM d, yyyy");
-
+/*
     Map<String, Object> qo;
     List<Map<String, Object>> lo  = new LinkedList();
     List<Map<String, Object>> buf = null;
@@ -205,6 +205,8 @@
             if (null != buf) lo.addAll(buf);
         }
     }
+*/
+    List<Map<String, Object>> lo = m.dumpObject();
 
     Collections.sort(lo, new Comparator<Map>() {
         public int compare(Map a, Map b) {

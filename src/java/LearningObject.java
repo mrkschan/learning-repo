@@ -52,6 +52,8 @@ public class LearningObject extends HttpServlet {
                _keyword = e.encodeForHTML(req.getParameter("keyword")),
                ref[]    = (String[]) pm.get("ref");
 
+        if (null == theme) theme = "";
+
         try {
             // filter empty ref
             List<String> _ref = new LinkedList<String>();
@@ -102,11 +104,11 @@ public class LearningObject extends HttpServlet {
                     );
                 }
             }
-
+/*
             Map<String, Object> q = new LinkedHashMap<String, Object>();
             q.put("name", theme);
             okay &= (null != m.queryTheme(q));
-
+*/
             if (!okay) {
                 ErrorHandler.reportError(
                     response, "Invalid learning object content"
@@ -114,8 +116,14 @@ public class LearningObject extends HttpServlet {
             }
         }
 
-        String keyword[] = _keyword.split(",");
-        for (int i = 0; i < keyword.length; ++i) keyword[i] = keyword[i].trim();
+        LinkedList<String> keywordlist = new LinkedList<String>();
+        String k, keyword[] = _keyword.split(",");
+        for (int i = 0; i < keyword.length; ++i) {
+            k = keyword[i].trim();
+            if (false == k.isEmpty()) keywordlist.add(k);
+        }
+        keyword = new String[keywordlist.size()];
+        keywordlist.toArray(keyword);
 
         if (null == oid) {
             // new learning object

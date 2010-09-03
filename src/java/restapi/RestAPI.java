@@ -1,10 +1,10 @@
 package restapi;
 
 import com.google.gson.Gson;
-import com.mongodb.QueryBuilder;
 import config.Config;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -14,6 +14,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import mongo.MongoController;
 
 @Path("/")
@@ -123,5 +124,30 @@ public class RestAPI {
         } catch (IOException ex) {
             return "{\"error\": 1}";
         }
+    }
+
+    @GET
+    @Path("topics/")
+    @Produces("application/json")
+    public String getTopics(@QueryParam("q") String query) {
+        
+        List<Map<String, Object>> categories = new Config().getTopics();
+        List<Map<String, String>> topics = new LinkedList<Map<String, String>>();
+        HashMap<String, String> m;
+
+        for (Map<String, Object> c : categories) {
+            for (String t : (List<String>) c.get("topic")) {
+                if (query.isEmpty() || t.toLowerCase().contains(query.toLowerCase())) {
+                    m = new HashMap<String, String>();
+                    m.put("id", t);
+                    m.put("name", t);
+
+                    topics.add(m);
+                }
+            }
+        }
+        if (0 == topics.size()) return "{\"error\": 1}";
+
+        return new Gson().toJson(topics);
     }
 }
