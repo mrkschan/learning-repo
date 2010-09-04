@@ -87,10 +87,10 @@ public class RestAPI {
      * Get learning objects by keyword
      */
     @GET
-    @Path("learning_objects/keyword/{keyword}")
+    @Path("learning_objects/keyword/")
     @Produces("application/json")
     public String getLearningObjectsByKeyword(
-        @PathParam("keyword") String keyword) {
+        @QueryParam("q") String keyword) {
 
         try {
             MongoController m = new MongoController();
