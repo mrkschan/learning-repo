@@ -176,7 +176,7 @@ public class MongoController {
     }
 
     public List<Map<String, Object>> dumpObject() {
-        return queryObject(null);
+        return queryObject((DBObject) null);
     }
 
     public List<Map<String, Object>> queryObject(Map<String, Object> object) {
@@ -189,6 +189,19 @@ public class MongoController {
         DBCursor c = (null == object)
                      ? objects.find()
                      : objects.find(new BasicDBObject(object));
+        if (0 == c.count()) return null;
+
+        List<Map<String, Object>> l = new LinkedList<Map<String, Object>>();
+        while (c.hasNext()) {
+            l.add(objToMap(c.next()));
+        }
+
+        return l;
+    }
+
+    public List<Map<String, Object>> queryObject(DBObject object) {
+
+        DBCursor c = objects.find(object);
         if (0 == c.count()) return null;
 
         List<Map<String, Object>> l = new LinkedList<Map<String, Object>>();
