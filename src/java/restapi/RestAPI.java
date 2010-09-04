@@ -1,6 +1,8 @@
 package restapi;
 
 import com.google.gson.Gson;
+import com.mongodb.DBObject;
+import com.mongodb.QueryBuilder;
 import config.Config;
 import java.io.IOException;
 import java.util.HashMap;
@@ -89,8 +91,7 @@ public class RestAPI {
     @GET
     @Path("learning_objects/keyword/")
     @Produces("application/json")
-    public String getLearningObjectsByKeyword(
-        @QueryParam("q") String keyword) {
+    public String getLearningObjectsByKeyword(@QueryParam("q") String keyword) {
 
         try {
             MongoController m = new MongoController();
@@ -126,6 +127,34 @@ public class RestAPI {
         }
     }
 
+    /**
+     * Query for learning object by keyword and summary
+     */
+    @GET
+    @Path("learning_objects/object/")
+    @Produces("application/json")
+    public String queryLearningObject(@QueryParam("q") String query) {
+
+        try {
+            MongoController m = new MongoController();
+            DBObject q = QueryBuilder.start()
+                .or(
+                    QueryBuilder.start("keyword")
+                        .regex(Pattern.compile(query, Pattern.CASE_INSENSITIVE)).get(),
+                    QueryBuilder.start("summary")
+                        .regex(Pattern.compile(query, Pattern.CASE_INSENSITIVE)).get()
+                ).get();
+
+            return new Gson().toJson(m.queryObject(q));
+
+        } catch (IOException ex) {
+            return "{\"error\": 1}";
+        }
+    }
+
+    /**
+     * Query for topic(s)
+     */
     @GET
     @Path("topics/")
     @Produces("application/json")

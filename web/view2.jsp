@@ -102,6 +102,11 @@
             height: 590px;
         }
 
+        div.browser div.abstract div.category .quicksearch button {
+            margin-top: -3px;
+            float: right;
+        }
+
         div.browser div.abstract div.list {
             float: left;
             width: 67%;
@@ -210,6 +215,11 @@
             margin-right: 0px;
         }
 
+        ul.boxes .quicksearch button {
+            margin-top: 5px;
+            float: right;
+        }
+
         ul.boxes li {
             border: 1px solid #2982C6;
             background-color: #FFFFFE;
@@ -294,7 +304,12 @@
                 <ul class="boxes">
                     <li>
                         <div><h4>Quick Search</h4></div>
-                        <div><label>Keyword:</label> <input type="text" /></div>
+                        <form class="quicksearch" action="#">
+                            <div>
+                                <label>Keyword: </label><input type="text" name="query" />
+                                <button>Search</button>
+                            </div>
+                        </form>
                     </li>
 <%
                 List<Map<String, Object>> topics = new Config().getTopics();
@@ -415,6 +430,39 @@
                         // $('div.to_abstract') can only be clicked in detail state
                         // toggle from detail state to abstract state
                         _this.roll();
+                    });
+
+                    $('ul.boxes form.quicksearch').submit(function() {
+                        // quick search
+                        // open browser and display search result
+
+                        // keep the quick search in abstract browser
+                        $('div.category').append($(this).parent().children().clone());
+
+                        $.getJSON(
+                            'restapi/learning_objects/object/?q=' + $('ul.boxes input[name=query]').val(),
+                            function(objects) {
+                                populateObjectList(objects);
+                            }
+                        );
+
+                        _this.paint();
+                        return false;
+                    });
+
+                    $('div.category form.quicksearch').live('submit', function() {
+                        // quick search in abstract browser
+                        _this.reload();
+
+                        $.getJSON(
+                            'restapi/learning_objects/object/?q=' +
+                                $('div.category form.quicksearch input[name=query]').val(),
+                            function(objects) {
+                                populateObjectList(objects);
+                            }
+                        );
+
+                        return false;
                     });
 
                     $('div.category a.topic').live('click', function() {
