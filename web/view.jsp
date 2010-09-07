@@ -140,7 +140,7 @@
                 <legend>Learning Object Repository</legend>
 
                 <div style="float: right">
-                    &gt; Make your submission <a href="index.jsp">Here</a>
+                    &gt; Make your submission <a href="submit.jsp">Here</a>
                 </div>
                 <div style="float: none">
                 <table>

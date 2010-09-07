@@ -299,6 +299,11 @@
             </ul>
         </div>
         <div class="container">
+            <div style="float: right">
+                &gt; Make your submission <a href="submit.jsp">Here</a>
+            </div>
+        </div>
+        <div class="container">
             <fieldset>
                 <legend>Learning Object Repository</legend>
                 <ul class="boxes">

@@ -69,7 +69,7 @@
                     <legend>Learning Object Editor</legend>
 
                     <div style="float: right">
-                        &gt; View all submission <a href="view.jsp">Here</a>
+                        &gt; View all submission <a href="index.jsp">Here</a>
                     </div>
                     <div>
                         <p>
