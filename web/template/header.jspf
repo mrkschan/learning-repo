@@ -26,4 +26,8 @@
         color: #D12F19;
     }
 </style>
-        
+
+<script type="text/javascript">
+    // exclude IE...
+    if ($.browser.msie) window.location.href = 'browser.html';
+</script>
