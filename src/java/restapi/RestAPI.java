@@ -152,6 +152,32 @@ public class RestAPI {
         }
     }
 
+
+    /**
+     * Query for learning object by student id
+     */
+    @GET
+    @Path("learning_objects/submitby")
+    @Produces("application/json")
+    public String getLearningObjectByWhomSubmit(@QueryParam("sid") String sid) {
+
+        try {
+            MongoController m = new MongoController();
+            DBObject q = QueryBuilder.start()
+                .or(
+                    QueryBuilder.start("sid")
+                        .is(sid).get(),
+                    QueryBuilder.start("pid")
+                        .is(sid).get()
+                ).get();
+
+            return new Gson().toJson(m.queryObject(q));
+
+        } catch (IOException ex) {
+            return "{\"error\": 1}";
+        }
+    }
+
     /**
      * Query for topic(s)
      */

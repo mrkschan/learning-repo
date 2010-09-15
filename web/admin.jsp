@@ -20,91 +20,107 @@
         <link rel="stylesheet" href="autocomplete/jquery.autocomplete.css" type="text/css" />
         <script type="text/javascript" src="autocomplete/lib/jquery.bgiframe.min.js"></script>
         <script type="text/javascript" src="autocomplete/jquery.autocomplete.js"></script>
+
+        <style type="text/css">
+
+            div.template {
+                display: none;
+            }
+
+            div.list div {
+                margin-bottom: 5px;
+            }
+
+            div.list div.date {
+                float: right;
+            }
+
+            div.list div.summary {
+                font-weight: bold;
+            }
+
+            div.list div.desc, div.list div.explain {
+                border: 1px solid #cccccc;
+                padding: 5px 5px 5px 5px;
+            }
+
+            div.list ul {
+                margin-left: 0px;
+                padding-left: 0px;
+            }
+
+            div.list ul li.thumbnail {
+                list-style: none;
+                border: 1px solid #8496ba;
+                margin: 5px 5px 5px 5px;
+                padding: 5px 5px 5px 5px;
+            }
+
+        </style>
     </head>
     <body>
+        <div class="template">
+            <ul>
+                <li class="thumbnail">
+                    <div class="preview">
+                        <div class="date"></div>
+                        <div class="summary"></div>
+                        <div class="keyword"></div>
+                        <div><label>Description:</label></div>
+                        <div class="desc"></div>
+                        <div><label>Explanation of Concept:</label></div>
+                        <div class="explain"></div>
+                        <div class="ref"></div>
+                    </div>
+                </li>
+            </ul>
+        </div>
         <div class="container">
-            <div>
-<script type="text/javascript">
-
-    var param = window.location.search.replace('?', '').split('&');
-    var _n = null, _k = null, _sh = null, p;
-    for (var idx in param) {
-        p = param[idx];
-        if (-1 != p.indexOf("name"))    _n  = p.split('=').pop();
-        if (-1 != p.indexOf("keyword")) _k  = p.split('=').pop();
-        if (-1 != p.indexOf("show"))    _sh = p.split('=').pop();
-    }
-
-    if (null != _n && null != _k) {
-        document.write('<p class="success">Theme Saved!</p>');
-    }
-</script>
-            </div>
-            <form action="define_theme" method="post">
-                <fieldset>
-                    <legend>Define Submission Theme</legend>
-
-                    <div style="float: right">
-                        &gt; View all submission <a href="view.jsp">Here</a>
-                    </div>
-                    <div>
-                        <p>
-                            <label for="name">Theme:</label>
-                            <input type="text" id="name" name="name" />
-<script type="text/javascript">
-    $(document).ready(function () {
-        $("#name").autocomplete("fetch_theme", {delay: 200}).result(
-            function() { fetch_keyword(); }
-        )
-    });
-    if (null != _n) $("#name").val(unescape(_n));
-</script>
-                        </p>
-                    </div>
-                    <div>
-                        <label for="keyword">Keywords (Comma Separated Value):</label>
-                        <br />
-                        <input type="text" id="keyword" name="keyword" size="80" />
-<script type="text/javascript">
-    if (null != _k) $("#keyword").val(unescape(_k));
-</script>
-                    </div>
-                    <div>
-                        <input type="radio" id="show" name="show_hide" value="true" /> <label for="show">Show</label>
-                        <input type="radio" id="hide" name="show_hide" value="false" /> <label for="hide">Hide</label>
-<script type="text/javascript">
-    if (null != _sh) {
-        if ('true' == _sh) $("#show").attr('checked', true);
-        else               $("#hide").attr('checked', true);
-    }
-</script>
-                    </div>
-                    <div>
-                        <button class="button positive">Assign Keywords to Theme</button>
-                        <a href="#" class="button" onclick="clear_keyword()">Clear Keywords</a>
-<script type="text/javascript">
-    function clear_keyword() {
-        $("#keyword").val('');
-    }
-    function fetch_keyword() {
-        $.getJSON("fetch_keyword?theme=" + $("#name").val(),
-        function (data) {
-            $("#keyword").val(data.keyword.join(', '));
-
-            if (data.show) {
-                $("#show").attr('checked', true);
-                $("#hide").attr('checked', false);
-            } else {
-                $("#show").attr('checked', false);
-                $("#hide").attr('checked', true);
-            }
-        });
-    }
-</script>
-                    </div>
-                </fieldset>
+            <form action="#">
+                <label>Student ID: </label><input type="text" id="sid" /> <button style="float: none">Search</button>
             </form>
+            <div class="list">
+            </div>
 <%@include file="template/credit.jspf"%>
         </div>
+        <script type="text/javascript">
+            $('form').submit(function() {
+                $.getJSON('restapi/learning_objects/submitby?sid=' + $('#sid').val(),
+                function(objects) {
+                    $('div.list').empty();
+                    var ul = $('<ul/>');
+
+                    for (var i in objects) {
+                        var li = $('.template .thumbnail').clone(),
+                            o = objects[i];
+
+                        $('.date', li).html(o['create']);
+                        $('.summary', li).html(o['summary']);
+                        $('.keyword', li).html(o['keyword'].join(', '));
+                        $('.desc', li).html(o['desc']);
+                        $('.explain', li).html(o['explain']);
+
+                        if (o['ref'] && 0 != o['ref'].length) {
+                            var r_ul = $('<ul/>');
+                            for (var ref_i in o['ref']) {
+                                r_ul.append(
+                                    $('<li/>', {
+                                        html: $('<a/>', {href: o['ref'][ref_i], html: o['ref'][ref_i]})
+                                    })
+                                );
+                            }
+                            $('.ref', li).html(r_ul);
+                        } else {
+                            $('.ref', li).html('<ul><li>No reference provided.</li></ul>');
+                        }
+
+                        ul.append(li);
+                    }
+
+                    $('div.list').append(ul);
+                });
+                return false;
+            });
+        </script>
     </body>
 </html>
