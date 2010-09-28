@@ -300,7 +300,8 @@
         </div>
         <div class="container">
             <div style="float: right">
-                &gt; Make your submission <a href="submit.jsp">Here</a>
+                &gt; Make your submission <a href="submit.jsp">Here</a><br />
+                &gt; Enquiry: <a href="mailto:<% out.print(new Config().getConfig("enquiry_email")); %>"><% out.print(new Config().getConfig("enquiry_email")); %></a><br />
             </div>
         </div>
         <div class="container">
