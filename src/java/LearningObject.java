@@ -18,6 +18,7 @@ import org.owasp.esapi.filters.SafeResponse;
 import util.AuthHandler;
 import util.ErrorHandler;
 
+// TODO: create a LearningObject model, validation & persistence inside the model
 public class LearningObject extends HttpServlet {
 
     /**
@@ -52,8 +53,42 @@ public class LearningObject extends HttpServlet {
                _keyword = e.encodeForHTML(req.getParameter("keyword")),
                ref[]    = (String[]) pm.get("ref");
 
+        // backward compatibility
         if (null == theme) theme = "";
 
+        // replace \r\n to \n, .replace may cause overflow
+        {
+            String buf = "";
+            int i, j = 0;
+            for (i = 0; i < desc.length() - 2;) {
+                if (desc.substring(i, i+2).equals("\r\n")) {
+                    buf += desc.substring(j, i) + "\n";
+                    j = i + 2;
+                    i = j;
+                } else {
+                    ++i;
+                }
+            }
+            buf += desc.substring(j);
+            desc = buf;
+        }
+        {
+            String buf = "";
+            int i, j = 0;
+            for (i = 0; i < explain.length() - 2;) {
+                if (explain.substring(i, i+2).equals("\r\n")) {
+                    buf += explain.substring(j, i) + "\n";
+                    j = i + 2;
+                    i = j;
+                } else {
+                    ++i;
+                }
+            }
+            buf += explain.substring(j);
+            explain = buf;
+        }
+
+        String errlog = "";
         try {
             // filter empty ref
             List<String> _ref = new LinkedList<String>();
@@ -69,49 +104,63 @@ public class LearningObject extends HttpServlet {
                 ref = null;
             }
         } catch (Exception ex) {
+            errlog = "Error occured when type-casting reference list to an array.\n";
             Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
-            ErrorHandler.reportError(response, "Invalid learning object content");
-            return;
+            ErrorHandler.reportError(response, "Invalid learning object content\n" + errlog);
         }
-
-        MongoController m = new MongoController();
 
         // validation
         {
             boolean okay = true;
 
-            okay &= ESAPI.validator().isValidInput(
-                "Learning Object Submission",
-                sid, "StudentID", 8, false
-            );
-            okay &= ESAPI.validator().isValidInput(
-                "Learning Object Submission",
-                pid, "StudentID", 8, false
-            );
-            okay &= ESAPI.validator().isValidInput(
-                "Learning Object Submission",
-                type, "MediaType", 8, false
-            );
-            okay &= (summary.length() <= 100);
-            okay &= (desc.length() <= 1024); // 1kB description limit (include \r\n)
-            okay &= (explain.length() <= 1024); // 1kB explain limit (include \r\n)
+            if (false == ESAPI.validator()
+                .isValidInput("Learning Object Submission", sid, "StudentID", 8, false))
+            {
+                okay = false;
+                errlog += "Invalid StudenrID - sid\n";
+            }
+            if (false == ESAPI.validator()
+                .isValidInput("Learning Object Submission", pid, "StudentID", 8, false))
+            {
+                okay = false;
+                errlog += "Invalid StudenrID - pid\n";
+            }
+            if (false == ESAPI.validator()
+                .isValidInput("Learning Object Submission", type, "MediaType", 8, false))
+            {
+                okay = false;
+                errlog += "Invalid MediaType\n";
+            }
+            if (summary.length() > 100)
+            {
+                okay = false;
+                errlog += "Invalid Summary Length\n";
+            }
+            if (desc.length() > 1024)
+            { // 1kB description limit (include \n)
+                okay = false;
+                errlog += "Invalid Description Length\n";
+            }
+            if (explain.length() > 1024)
+            { // 1kB explain limit (include \n)
+                okay = false;
+                errlog += "Invalid Explanation of Concept Length\n";
+            }
 
             if (null != ref) {
                 for (String _r : ref) {
-                    okay &= ESAPI.validator().isValidInput(
-                        "Learning Object Submission",
-                        _r, "ReferenceLink", Integer.MAX_VALUE, false
-                    );
+                    if (false == ESAPI.validator()
+                        .isValidInput("Learning Object Submission", _r, "ReferenceLink", Integer.MAX_VALUE, false))
+                    {
+                        okay = false;
+                        errlog += "Invalid ReferenctLink Format\n";
+                    }
                 }
             }
-/*
-            Map<String, Object> q = new LinkedHashMap<String, Object>();
-            q.put("name", theme);
-            okay &= (null != m.queryTheme(q));
-*/
+
             if (!okay) {
                 ErrorHandler.reportError(
-                    response, "Invalid learning object content"
+                    response, "Invalid learning object content\n" + errlog
                 );
             }
         }
@@ -125,13 +174,15 @@ public class LearningObject extends HttpServlet {
         keyword = new String[keywordlist.size()];
         keywordlist.toArray(keyword);
 
+
+        MongoController m = new MongoController();
         if (null == oid) {
             // new learning object
             m.saveObject(
                 sid, pid, theme, type, summary, desc, explain, keyword, ref, USER
             );
 
-            res.sendRedirect("?sid=" + sid + "&pid=" + pid);
+            res.sendRedirect("submit.jsp?sid=" + sid + "&pid=" + pid);
         } else {
             // update learning object
             Map<String, Object> qo = new LinkedHashMap();
