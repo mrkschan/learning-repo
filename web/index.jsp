@@ -179,7 +179,7 @@
         }
 
         div.browser div.detail div.metadata div {
-            white-space: wrap;
+            white-space: normal;
             padding-left: 10px;
             border: 1px solid #8496ba;
         }
