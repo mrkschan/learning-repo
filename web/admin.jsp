@@ -35,6 +35,11 @@
                 float: right;
             }
 
+            div.list div.edit {
+                float: right;
+                margin-left: 5px;
+            }
+
             div.list div.summary {
                 font-weight: bold;
             }
@@ -63,6 +68,7 @@
             <ul>
                 <li class="thumbnail">
                     <div class="preview">
+                        <div class="edit"></div>
                         <div class="date"></div>
                         <div class="summary"></div>
                         <div class="keyword"></div>
@@ -95,6 +101,9 @@
                             o = objects[i];
 
                         $('.date', li).html(o['create']);
+                        $('.edit', li).html(
+                            $('<a/>', {href: 'edit.jsp?oid=' + o._id, html: 'Edit'})
+                        );
                         $('.summary', li).html(o['summary']);
                         $('.keyword', li).html(o['keyword'].join(', '));
                         $('.desc', li).html(o['desc']);
