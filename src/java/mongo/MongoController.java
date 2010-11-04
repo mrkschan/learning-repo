@@ -21,6 +21,8 @@ import org.bson.types.ObjectId;
 
 public class MongoController {
 
+    private static MongoController instance;
+
     private Mongo m;
     private DB repo;
 //    private GridFS gfs;
@@ -30,7 +32,14 @@ public class MongoController {
     private DBCollection views;
     private DBCollection annotations;
 
-    public MongoController() throws IOException {
+    public static MongoController getInstance() throws IOException {
+        if (null == MongoController.instance) {
+            MongoController.instance = new MongoController();
+        }
+        return MongoController.instance;
+    }
+
+    private MongoController() throws IOException {
         try {
             Config c   = new Config();
             String ip  = c.getConfig("mongodb_ip");

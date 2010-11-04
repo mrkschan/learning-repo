@@ -35,7 +35,8 @@ public class Keyword extends HttpServlet {
         Map<String, Object> t, q = new LinkedHashMap();
         q.put("name", req.getParameter("theme"));
 
-        MongoController m = new MongoController();
+//        MongoController m = new MongoController();
+        MongoController m = MongoController.getInstance();
         t = m.getTheme(q);
 
         if (null == t) {

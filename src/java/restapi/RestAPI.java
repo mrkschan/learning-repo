@@ -37,7 +37,8 @@ public class RestAPI {
     @Produces("application/json")
     public String getLearningObjects() {
         try {
-            MongoController m = new MongoController();
+//            MongoController m = new MongoController();
+            MongoController m = MongoController.getInstance();
 
             List<Map<String, Object>> objects = m.dumpObject();
             return new Gson().toJson(objects);
@@ -67,7 +68,8 @@ public class RestAPI {
             }
             if (null == topics) return "{\"error\": 1}";
 
-            MongoController m = new MongoController();
+//            MongoController m = new MongoController();
+            MongoController m = MongoController.getInstance();
 
             HashMap<String, Object> hm = new HashMap<String, Object>();
 
@@ -94,7 +96,8 @@ public class RestAPI {
     public String getLearningObjectsByKeyword(@QueryParam("q") String keyword) {
 
         try {
-            MongoController m = new MongoController();
+//            MongoController m = new MongoController();
+            MongoController m = MongoController.getInstance();
 
             Map<String, Object> q = new HashMap<String, Object>();
             q.put("keyword", Pattern.compile(keyword, Pattern.CASE_INSENSITIVE));
@@ -115,7 +118,8 @@ public class RestAPI {
     public String getLearningObjectById(@PathParam("oid") String oid) {
 
         try {
-            MongoController m = new MongoController();
+//            MongoController m = new MongoController();
+            MongoController m = MongoController.getInstance();
 
             Map<String, Object> q = new HashMap<String, Object>();
             q.put("_id", oid);
@@ -136,7 +140,8 @@ public class RestAPI {
     public String queryLearningObject(@QueryParam("q") String query) {
 
         try {
-            MongoController m = new MongoController();
+//            MongoController m = new MongoController();
+            MongoController m = MongoController.getInstance();
             DBObject q = QueryBuilder.start()
                 .or(
                     QueryBuilder.start("keyword")
@@ -162,7 +167,8 @@ public class RestAPI {
     public String getLearningObjectByWhomSubmit(@QueryParam("sid") String sid) {
 
         try {
-            MongoController m = new MongoController();
+//            MongoController m = new MongoController();
+            MongoController m = MongoController.getInstance();
             DBObject q = QueryBuilder.start()
                 .or(
                     QueryBuilder.start("sid")

@@ -58,7 +58,9 @@ public class Theme extends HttpServlet {
             Map<String, Object> q = new LinkedHashMap();
             q.put("name", p);
 
-            MongoController m = new MongoController();
+//            MongoController m = new MongoController();
+            MongoController m = MongoController.getInstance();
+
             List<Map<String, Object>> themes = m.queryTheme(q);
 
             res.setContentType("text/plain;charset=UTF-8");
@@ -90,7 +92,8 @@ public class Theme extends HttpServlet {
             String keyword[] = null;
             if (null != k) keyword = k.replace(", ", ",").split(",");
 
-            MongoController m = new MongoController();
+//            MongoController m = new MongoController();
+            MongoController m = MongoController.getInstance();
             m.saveTheme(n, keyword, _sh);
 
             if (null == k) k = "";

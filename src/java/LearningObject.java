@@ -175,7 +175,8 @@ public class LearningObject extends HttpServlet {
         keywordlist.toArray(keyword);
 
 
-        MongoController m = new MongoController();
+//        MongoController m = new MongoController();
+        MongoController m = MongoController.getInstance();
         if (null == oid) {
             // new learning object
             m.saveObject(

@@ -49,7 +49,8 @@ public class Evaluation extends HttpServlet {
         if (-1 == user_rating.compareTo(0d) || 1 == user_rating.compareTo(5d))
             ErrorHandler.reportError(res, "Vote Rating less than 0 or larger than 5");
 
-        MongoController m = new MongoController();
+//        MongoController m = new MongoController();
+        MongoController m = MongoController.getInstance();
 
         Map<String, Object> qo = new LinkedHashMap();
         qo.put("_id", oid);
@@ -92,7 +93,8 @@ public class Evaluation extends HttpServlet {
 
         String oid = req.getParameter("oid");
 
-        MongoController m = new MongoController();
+//        MongoController m = new MongoController();
+        MongoController m = MongoController.getInstance();
 
         Map<String, Object> q = new LinkedHashMap();
         q.put("_id", oid);
@@ -124,7 +126,8 @@ public class Evaluation extends HttpServlet {
 
         String oid = req.getParameter("oid");
 
-        MongoController m = new MongoController();
+//        MongoController m = new MongoController();
+        MongoController m = MongoController.getInstance();
 
         Map<String, Object> q = new LinkedHashMap();
         q.put("_id", oid);
