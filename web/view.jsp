@@ -155,7 +155,8 @@
                         </td>
                     </tr>
 <%
-    MongoController m = new MongoController();
+//    MongoController m = new MongoController();
+    MongoController m = MongoController.getInstance();
 
     Map<String, Object> qt = new LinkedHashMap();
     qt.put("show", true);
