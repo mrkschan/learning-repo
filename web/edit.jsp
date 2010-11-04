@@ -25,7 +25,8 @@
     String oid = req.getParameter("oid");
     if (null == oid) { response.sendRedirect("evil.html"); return; }
 
-    MongoController m = new MongoController();
+//    MongoController m = new MongoController();
+    MongoController m = MongoController.getInstance();
 
     Map<String, Object> qo = new LinkedHashMap();
     qo.put("_id", oid);
