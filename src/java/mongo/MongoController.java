@@ -464,6 +464,10 @@ public class MongoController {
         return hm;
     }
 
+    public List<String> distinctSubmit() {
+        return objects.distinct("submit");
+    }
+
 /*
     public Map<String, Object> getFile(Map<String, Object> object) {
 
