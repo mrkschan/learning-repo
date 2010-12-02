@@ -37,6 +37,10 @@
         <servlet-class>restapi.RESTDispatcher</servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
+    <servlet>
+        <servlet-name>TrackCategory</servlet-name>
+        <servlet-class>tracker.TrackCategory</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>DefineTheme</servlet-name>
         <url-pattern>/define_theme</url-pattern>
@@ -72,6 +76,10 @@
     <servlet-mapping>
         <servlet-name>RESTDispatcher</servlet-name>
         <url-pattern>/restapi/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>TrackCategory</servlet-name>
+        <url-pattern>/tracker/category/*</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

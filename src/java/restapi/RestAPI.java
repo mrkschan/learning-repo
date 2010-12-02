@@ -18,6 +18,7 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
@@ -296,4 +297,30 @@ public class RestAPI {
                 .header("Content-Disposition", "attachment; filename=stats.xls")
                 .build();
     }
+/*
+    @POST
+    @Path("tracker/category/{category}")
+    public void track_category(@PathParam("category") String category) {
+    }
+
+    @POST
+    @Path("tracker/keyword/{keyword}")
+    public void track_keyword(@PathParam("keyword") String keyword) {
+    }
+
+    @POST
+    @Path("tracker/object/{id}")
+    public void track_object(@PathParam("id") String object_id) {
+        // how to track user ... without session?
+
+        try {
+            MongoController m = MongoController.getInstance();
+        } catch (IOException ex) {
+            Logger.getLogger(RestAPI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+ */
 }
+
+
+

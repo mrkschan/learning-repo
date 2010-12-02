@@ -346,6 +346,10 @@
                  * - resize from big to small, overlay not covering much
                  */
 
+                function track(selector, event, callback) {
+                    $(selector).live(event, callback);
+                }
+
                 // learning object browser
                 Browser = function() {
                     var _this = this;
@@ -741,6 +745,28 @@
                     });
 
                     new Browser();
+
+                    track('li.category', 'click', function() {
+                        $.ajax({
+                            url: 'tracker/category/' + $('div.header > h4', this).html(),
+                            method: 'POST'
+                        });
+                    });
+
+                    track('a.topic', 'click', function() {
+                        $.ajax({
+                            url: 'restapi/tracker/keyword/' + $(this).html(),
+                            method: 'POST'
+                        });
+                    });
+
+                    track('div.list li.thumbnail', 'click', function() {
+                        $.ajax({
+                            url: 'restapi/tracker/object/' + $(this).attr('oid'),
+                            method: 'POST'
+                        });
+                    });
+
                 });
             })(jQuery);
 

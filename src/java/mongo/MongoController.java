@@ -31,6 +31,7 @@ public class MongoController {
     private DBCollection votes;
     private DBCollection views;
     private DBCollection annotations;
+    private DBCollection category_views;
 
     public static MongoController getInstance() throws IOException {
         if (null == MongoController.instance) {
@@ -60,6 +61,7 @@ public class MongoController {
             votes       = repo.getCollection("vote");
             views       = repo.getCollection("view");
             annotations = repo.getCollection("annotation");
+            category_views = repo.getCollection("category_view");
 
             // create index for votes
             DBObject vote_idx = new BasicDBObject();
@@ -466,6 +468,34 @@ public class MongoController {
 
     public List<String> distinctSubmit() {
         return objects.distinct("submit");
+    }
+
+    public void saveCategoryView(String category, String user) {
+        BasicDBObject o = new BasicDBObject();
+
+        o.put("category", category);
+        o.put("user", user);
+
+        category_views.insert(o);
+    }
+
+    public Map<String, Object> getCategoryView(Map<String, Object> view) {
+        String _id = (String) view.get("_id");
+        if (null != _id) view.put("_id", new ObjectId(_id));
+
+        DBObject o = category_views.findOne(new BasicDBObject(view));
+
+        if (null == o) return null;
+
+        return categoryViewToMap(o);
+    }
+
+    private Map<String, Object> categoryViewToMap(DBObject o) {
+        Map<String, Object> hm = o.toMap();
+
+        hm.put("_id", hm.get("_id").toString());
+
+        return hm;
     }
 
 /*
