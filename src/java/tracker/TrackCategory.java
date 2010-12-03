@@ -62,7 +62,7 @@ public class TrackCategory extends HttpServlet {
                         m.saveCategoryView(category, USER);
                     }
                     res.setStatus(HttpServletResponse.SC_OK);
-                    break;
+                    return;
                 }
             }
             res.sendError(HttpServletResponse.SC_NOT_FOUND);
