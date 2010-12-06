@@ -48,7 +48,23 @@ public class TrackCategory extends HttpServlet {
 
         // only accepts uri - /tracker/category/{category}
         try {
-            String category = uri_segments[uri_segments.length - 1];
+            // align uri
+            int idx = 0;
+            if (!uri_segments[idx].equals("tracker")) ++idx;
+
+            String category = null;
+            int category_idx = idx + 3;
+            if (category_idx < uri_segments.length) {
+                category = "";
+                while (category_idx < uri_segments.length) {
+                    category += uri_segments[category_idx++];
+                    if (category_idx < uri_segments.length) {
+                        category += "/";
+                    }
+                }
+            } else {
+                category = uri_segments[uri_segments.length - 1];
+            }
 
             List<Map<String, Object>> categories = new Config().getTopics();
             for (Map<String, Object> c: categories) {
