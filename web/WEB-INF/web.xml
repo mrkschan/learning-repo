@@ -41,6 +41,10 @@
         <servlet-name>TrackCategory</servlet-name>
         <servlet-class>tracker.TrackCategory</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>TrackKeyword</servlet-name>
+        <servlet-class>tracker.TrackKeyword</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>DefineTheme</servlet-name>
         <url-pattern>/define_theme</url-pattern>
@@ -80,6 +84,10 @@
     <servlet-mapping>
         <servlet-name>TrackCategory</servlet-name>
         <url-pattern>/tracker/category/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>TrackKeyword</servlet-name>
+        <url-pattern>/tracker/keyword/*</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

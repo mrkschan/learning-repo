@@ -531,6 +531,14 @@
                         );
 
                         _this.paint(); // repaint browser, enter abstract state
+
+                        // prevent event propagation to li.category also prevent .live
+                        // call tracker explicitly
+                        $.ajax({
+                            url: 'tracker/keyword/' + $(this).html(),
+                            method: 'POST'
+                        });
+
                         return false; // stop event propagation to li.category
                     });
 
@@ -755,7 +763,7 @@
 
                     track('a.topic', 'click', function() {
                         $.ajax({
-                            url: 'restapi/tracker/keyword/' + $(this).html(),
+                            url: 'tracker/keyword/' + $(this).html(),
                             method: 'POST'
                         });
                     });
