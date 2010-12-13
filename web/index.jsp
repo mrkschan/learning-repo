@@ -770,7 +770,7 @@
 
                     track('div.list li.thumbnail', 'click', function() {
                         $.ajax({
-                            url: 'restapi/tracker/object/' + $(this).attr('oid'),
+                            url: 'tracker/object/' + $(this).attr('oid'),
                             method: 'POST'
                         });
                     });

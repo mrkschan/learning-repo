@@ -33,6 +33,7 @@ public class MongoController {
     private DBCollection annotations;
     private DBCollection category_views;
     private DBCollection topic_views;
+    private DBCollection object_views;
 
     public static MongoController getInstance() throws IOException {
         if (null == MongoController.instance) {
@@ -64,6 +65,7 @@ public class MongoController {
             annotations = repo.getCollection("annotation");
             category_views = repo.getCollection("category_view");
             topic_views = repo.getCollection("topic_view");
+            object_views = repo.getCollection("object_view");
 
             // create index for votes
             DBObject vote_idx = new BasicDBObject();
@@ -527,6 +529,35 @@ public class MongoController {
 
         return hm;
     }
+
+    public void saveObjectView(String object_id, String user) {
+        BasicDBObject o = new BasicDBObject();
+
+        o.put("object_id", object_id);
+        o.put("user", user);
+
+        object_views.insert(o);
+    }
+
+    public Map<String, Object> getObjectView(Map<String, Object> view) {
+        String _id = (String) view.get("_id");
+        if (null != _id) view.put("_id", new ObjectId(_id));
+
+        DBObject o = object_views.findOne(new BasicDBObject(view));
+
+        if (null == o) return null;
+
+        return objectViewToMap(o);
+    }
+
+    private Map<String, Object> objectViewToMap(DBObject o) {
+        Map<String, Object> hm = o.toMap();
+
+        hm.put("_id", hm.get("_id").toString());
+
+        return hm;
+    }
+
 
 /*
     public Map<String, Object> getFile(Map<String, Object> object) {
