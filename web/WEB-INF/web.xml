@@ -53,6 +53,10 @@
         <servlet-name>UserSubmissionStats</servlet-name>
         <servlet-class>stats.UserSubmissionStats</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>CategoryVisitStats</servlet-name>
+        <servlet-class>stats.CategoryVisitStats</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>DefineTheme</servlet-name>
         <url-pattern>/define_theme</url-pattern>
@@ -104,6 +108,10 @@
     <servlet-mapping>
         <servlet-name>UserSubmissionStats</servlet-name>
         <url-pattern>/stats/user/submission</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CategoryVisitStats</servlet-name>
+        <url-pattern>/stats/visit/category</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

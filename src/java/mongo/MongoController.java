@@ -502,6 +502,19 @@ public class MongoController {
         return hm;
     }
 
+    public List<Map<String, Object>> getCategoryViews() {
+
+        DBCursor c = category_views.find();
+        if (0 == c.count()) return null;
+
+        List<Map<String, Object>> l = new LinkedList<Map<String, Object>>();
+        while (c.hasNext()) {
+            l.add(categoryViewToMap(c.next()));
+        }
+
+        return l;
+    }
+
     public void saveTopicView(String topic, String user) {
         BasicDBObject o = new BasicDBObject();
 
