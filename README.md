@@ -23,3 +23,10 @@ Run the following Ant task to build the .war:
 
     $> ant dist
 
+# Developer Notes #
+
+If you find netbeans is blaming syntax error of missing javax.servlet, simply modify and add the line below to nbproject/private/private.properties
+
+    j2ee.server.path=<path_to_j2ee_server>
+
+Remember to place the appropriate path to <path_to_j2ee_server>
