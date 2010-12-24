@@ -223,6 +223,7 @@ public class RestAPI {
         return new Gson().toJson(topics);
     }
 
+    /*
     @GET
     @Path("stats/user")
     @Produces("application/xls")
@@ -297,6 +298,7 @@ public class RestAPI {
                 .header("Content-Disposition", "attachment; filename=stats.xls")
                 .build();
     }
+    */
 }
 
 

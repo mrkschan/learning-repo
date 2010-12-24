@@ -49,6 +49,10 @@
         <servlet-name>TrackObject</servlet-name>
         <servlet-class>tracker.TrackObject</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>UserSubmissionStats</servlet-name>
+        <servlet-class>stats.UserSubmissionStats</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>DefineTheme</servlet-name>
         <url-pattern>/define_theme</url-pattern>
@@ -96,6 +100,10 @@
     <servlet-mapping>
         <servlet-name>TrackObject</servlet-name>
         <url-pattern>/tracker/object/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>UserSubmissionStats</servlet-name>
+        <url-pattern>/stats/user/submission</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
