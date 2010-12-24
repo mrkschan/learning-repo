@@ -86,6 +86,7 @@
                 Download 
                 | <a href="stats/user/submission">Learning Object Report</a>
                 | <a href="stats/visit/category">Category View Report</a>
+                | <a href="stats/visit/topic">Topic View Report</a>
             </div>
             <form action="#">
                 <label>Student ID: </label><input type="text" id="sid" /> <button style="float: none">Search</button>
