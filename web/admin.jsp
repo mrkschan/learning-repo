@@ -82,6 +82,10 @@
             </ul>
         </div>
         <div class="container">
+            <div>
+                Download 
+                | <a href="restapi/stats/user">Learning Object Report</a>
+            </div>
             <form action="#">
                 <label>Student ID: </label><input type="text" id="sid" /> <button style="float: none">Search</button>
             </form>
