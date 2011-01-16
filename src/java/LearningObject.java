@@ -51,6 +51,7 @@ public class LearningObject extends HttpServlet {
                desc     = e.encodeForHTML(req.getParameter("desc")),
                explain  = e.encodeForHTML(req.getParameter("explain")),
                _keyword = e.encodeForHTML(req.getParameter("keyword")),
+               comment  = e.encodeForHTML(req.getParameter("comment")),
                ref[]    = (String[]) pm.get("ref");
 
         // backward compatibility
@@ -146,6 +147,11 @@ public class LearningObject extends HttpServlet {
                 okay = false;
                 errlog += "Invalid Explanation of Concept Length\n";
             }
+            if (comment.length() > 1024)
+            { // 1kB comment limit (include \n)
+                okay = false;
+                errlog += "Invalid Comment Length\n";
+            }
 
             if (null != ref) {
                 for (String _r : ref) {
@@ -201,6 +207,7 @@ public class LearningObject extends HttpServlet {
             o.put("explain", explain);
             o.put("keyword", keyword);
             o.put("ref", ref);
+            o.put("comment", comment);
             m.updateObject(oid, o);
 
             res.sendRedirect("edit.jsp?oid=" + oid + "&sid=" + sid + "&pid=" + pid);

@@ -80,8 +80,9 @@
             height: 600px;
         }
 
-        div.browser div.exit {
+        div.browser div.exit, div.browser div.edit {
             float: right;
+            margin-left: 5px;
         }
 
         div.browser div.exit a {
@@ -263,6 +264,9 @@
         <div class="overlay"></div>
         <div class="container browser">
             <div class="exit"><a href="#">[x]</a></div>
+            <% if (admin.contains(USER)) { %>
+                <div class="edit"><a href="#">edit</a></div>
+            <% } %>
             <div class="abstract">
                 <div class="category"></div>
                 <div class="list">
@@ -578,6 +582,9 @@
                         // toggle from abstract state to detail state
                         _this.roll();
 
+                        $('div.overlay, div.edit a').attr('href',
+                                "edit.jsp?oid=" + $(this).attr('oid'));
+
                         // retrieve learning object data
                         // fill data to detail browser
                         $.getJSON(
@@ -653,6 +660,7 @@
                             left: 150
                         });
                         $('div.browser div.abstract').show();
+                        $('div.edit').hide();
                     }
                     this.roll = function(browser) {
                         $('div.browser div.abstract').hide();
@@ -694,6 +702,7 @@
                             left: 5
                         });
                         $('div.browser div.detail').show();
+                        $('div.edit').show();
                     }
                     this.roll = function(browser) {
                         $('div.external iframe').attr('src', 'data:text/html;charset=utf-8,Loading...');
@@ -709,7 +718,7 @@
                         $('div.category, div.list div.content', $('div.browser')).empty();
                         $('div.list div.loading').show();
                         $('div.browser div.detail').hide();
-                        
+
                         browser.setState(new Browser.hidden_state());
                     }
                     this.resize = function(browser) {

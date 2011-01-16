@@ -68,7 +68,7 @@
                 <input type="hidden" id="oid" name="oid" value="<% out.print(oid); %>" />
                 <fieldset>
                     <legend>Learning Object Editor</legend>
-
+// TODO: provide link to view object on index.jsp
                     <div style="float: right">
                         &gt; View all submission <a href="index.jsp">Here</a>
                     </div>
@@ -113,6 +113,14 @@
                         <label>Explanation of Concepts:</label>
                         <br />
                         <textarea id="explain" name="explain" cols="60" rows="10"><% out.print(o.get("explain")); %></textarea>
+                    </div>
+                    <div>
+                        <label>Comment:</label>
+                        <br />
+                        <textarea id="comment" name="comment" cols="60" rows="10"><%
+                            String _comment = (String) o.get("comment");
+                            if (null != _comment) out.print(_comment);
+                        %></textarea>
                     </div>
                     <div>
                         <label for="ref">Any Reference of the Object: (http/https, ftp/ftps)</label>

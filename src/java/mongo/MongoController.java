@@ -178,6 +178,7 @@ public class MongoController {
         // TODO: remove this redundant field
         //       object_id already contains a timestamp
         o.put("create", new Date());
+        o.put("comment", "");
 
         objects.insert(o);
     }
