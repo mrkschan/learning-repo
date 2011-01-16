@@ -15,7 +15,15 @@ public class AuthHandler {
         HttpSession s = request.getSession(true);
 
         if (null == s.getAttribute("user")) {
-            String auth_svr = new Config().getConfig("auth_server_url"),
+            Config c = new Config();
+
+            if (Boolean.valueOf(c.getConfig("dev_mode"))) {
+                String user = c.getConfig("dev_admin");
+                s.setAttribute("user", user);
+                return user;
+            }
+
+            String auth_svr = c.getConfig("auth_server_url"),
                    nonce    = UUID.randomUUID().toString();
 
             s.setAttribute("nonce", nonce);
