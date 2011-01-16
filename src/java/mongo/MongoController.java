@@ -175,6 +175,8 @@ public class MongoController {
         o.put("rating", new Double(.0));
         o.put("view_count", new Double(0));
         o.put("submit", submit_by);
+        // TODO: remove this redundant field
+        //       object_id already contains a timestamp
         o.put("create", new Date());
 
         objects.insert(o);
