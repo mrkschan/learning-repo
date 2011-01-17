@@ -173,7 +173,7 @@
 
         div.browser div.detail div.metadata {
             float: left;
-            height: 590px;
+            height: 570px;
             width: 25%;
             padding: 5px 5px 5px 5px;
             overflow-y: auto;
@@ -347,10 +347,8 @@
         <script type="text/javascript">
             (function ($) {
 
-                /*
-                 * TODO:
-                 * - resize from big to small, overlay not covering much
-                 */
+                var margin_height = parseInt($('body').css('margin-top'))
+                                    + parseInt($('body').css('margin-bottom'));
 
                 function track(selector, event, callback) {
                     $(selector).live(event, callback);
@@ -640,8 +638,10 @@
                         // when repaint in hidden state
                         // browser is shown
                         $('div.overlay').css({
-                            width: $(window).width(),
-                            height: $(window).height()
+                            width: $('body').width(),
+                            height: $('body').height() + margin_height
+//                            width: $(window).width(),
+//                            height: $(window).height()
                         });
                         $('div.overlay, div.browser').show();
                         
@@ -685,8 +685,10 @@
                     }
                     this.resize = function(browser) {
                         $('div.overlay').css({
-                            width: $(window).width(),
-                            height: $(window).height()
+                            width: $('body').width(),
+                            height: $('body').height() + margin_height
+//                            width: $(window).width(),
+//                            height: $(window).height()
                         });
                         $('div.browser').css({
                             width: $(window).width() - 300
@@ -731,8 +733,10 @@
                     }
                     this.resize = function(browser) {
                         $('div.overlay').css({
-                            width: $(window).width(),
-                            height: $(window).height()
+                            width: $('body').width(),
+                            height: $('body').height() + margin_height
+//                            width: $(window).width(),
+//                            height: $(window).height()
                         });
                         $('div.browser').css({
                             width: $(window).width() - 20
