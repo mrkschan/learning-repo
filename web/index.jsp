@@ -602,7 +602,14 @@
                                 }
 
                                 if (r['ref'] && 0 != r['ref'].length) {
-                                    $('div.external iframe').attr('src', r['ref'][0]);
+                                    var utube_regex = /youtube\.com\/watch\?v=(.+)/;
+                                    var m = r['ref'][0].match(utube_regex);
+                                    if (m) {
+                                        var utube_iframe_src = 'http://www.youtube.com/embed/';
+                                        $('div.external iframe').attr('src', utube_iframe_src + m[1]);
+                                    } else {
+                                        $('div.external iframe').attr('src', r['ref'][0]);
+                                    }
                                     var ul = $('<ul/>'), href;
                                     for (var i in r['ref']) {
                                         href = r['ref'][i];
