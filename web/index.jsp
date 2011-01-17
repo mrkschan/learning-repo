@@ -286,6 +286,8 @@
                     <div class="desc"></div>
                     <label>Explanation of Concepts:</label>
                     <div class="explain"></div>
+                    <label>Comment from TA:</label>
+                    <div class="comment"></div>
                     <label>References:</label>
                     <div class="ref"></div>
                 </div>
@@ -594,6 +596,12 @@
                                 $('div.metadata div.keyword').html(r['keyword'].join(', '));
                                 $('div.metadata div.desc').html(r['desc']);
                                 $('div.metadata div.explain').html(r['explain']);
+
+                                if (r['comment']) {
+                                    $('div.metadata div.comment').html(r['comment']);
+                                } else {
+                                    $('div.metadata div.comment').html('n/a');
+                                }
 
                                 if (r['ref'] && 0 != r['ref'].length) {
                                     $('div.external iframe').attr('src', r['ref'][0]);
