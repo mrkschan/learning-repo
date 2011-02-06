@@ -21,6 +21,12 @@
         <script type="text/javascript" src="autocomplete/lib/jquery.bgiframe.min.js"></script>
         <script type="text/javascript" src="autocomplete/jquery.autocomplete.js"></script>
 
+<!-- jQuery-ui settings -->
+        <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/themes/flick/jquery-ui.css"
+              rel="stylesheet" type="text/css" />
+        <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/jquery-ui.min.js"
+                type="text/javascript"></script>
+
         <style type="text/css">
 
             div.template {
@@ -82,20 +88,58 @@
             </ul>
         </div>
         <div class="container">
-            <div>
-                Download 
-                | <a href="stats/user/submission">Learning Object Report</a>
-                | <a href="stats/visit/category">Category View Report</a>
-                | <a href="stats/visit/topic">Topic View Report</a>
-            </div>
-            <form action="#">
-                <label>Student ID: </label><input type="text" id="sid" /> <button style="float: none">Search</button>
-            </form>
-            <div class="list">
-            </div>
+            <fieldset>
+                <legend>Statistics</legend>
+                <form action="#">
+                    <div class="span-15 suffix-9 last">
+                        <label for="since">Since: </label><input id="since" type="text" />
+                        <label for="until">Until: </label><input id="until" type="text" />
+                        <button id="range_reset" style="float: right;">Reset Time Range</button>
+                    </div>
+                    <div>
+                        Download &gt;
+                          <a id="link_object" href="stats/user/submission?">Learning Object Report</a>
+                        | <a id="link_view_category" href="stats/visit/category?">Category View Report</a>
+                        | <a id="link_view_topic" href="stats/visit/topic?">Topic View Report</a>
+                    </div>
+                </form>
+            </fieldset>
+            <fieldset>
+                <legend>Learning Object Lookup</legend>
+                <form action="#">
+                    <label>Student ID: </label><input type="text" id="sid" /> <button style="float: none">Search</button>
+                </form>
+                <div class="list span-24">
+                </div>
+            </fieldset>
 <%@include file="template/credit.jspf"%>
         </div>
         <script type="text/javascript">
+            function href_base(href, token) {
+                var token_idx = href.indexOf(token);
+                return href.substring(0, token_idx);
+            }
+
+            $('document').ready(function() {
+                $('#since, #until').datepicker({changeYear: true, changeMonth: true});
+                $('#since, #until').change(function() {
+                    $('#link_object, #link_view_category, #link_view_topic')
+                    .each(function(idx, el) {
+                        $(el).attr('href', href_base($(el).attr('href'), '?')
+                                         + '?since=' + $('#since').val()
+                                         + '&until=' + $('#until').val());
+                    });
+                });
+                $('#range_reset').click(function (){
+                    $('#link_object, #link_view_category, #link_view_topic')
+                    .each(function(idx, el) {
+                        $(el).attr('href', href_base($(el).attr('href'), '?') + '?');
+                    });
+                    $('#since, #until').val('');
+                    return false;
+                });
+            });
+
             $('form').submit(function() {
                 $.getJSON('restapi/learning_objects/submitby?sid=' + $('#sid').val(),
                 function(objects) {
