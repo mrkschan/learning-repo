@@ -204,6 +204,23 @@ public class MongoController {
             if (null != _id) object.put("_id", new ObjectId(_id));
         }
 
+        return queryObject(object, null, null);
+    }
+
+    public List<Map<String, Object>> 
+            queryObject(Map<String, Object> object, Date since, Date until) {
+
+        if (null == object.get("_id")) {
+            if (null != since && null != until) {
+                object.put("_id", new BasicDBObject("$gte", new ObjectId(since))
+                                            .append("$lte", new ObjectId(until)));
+            } else if (null != since) {
+                object.put("_id", new BasicDBObject("$gte", new ObjectId(since)));
+            } else if (null != until) {
+                object.put("_id", new BasicDBObject("$lte", new ObjectId(until)));
+            }
+        }
+
         DBCursor c = (null == object)
                      ? objects.find()
                      : objects.find(new BasicDBObject(object));
