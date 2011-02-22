@@ -10,6 +10,9 @@
 <%@include file="template/auth_header.jspf" %>
 
 <%@ page import="config.Config" %>
+<%@ page import="org.bson.types.ObjectId" %>
+<%@ page import="java.text.SimpleDateFormat" %>
+<%@ page import="java.util.Date" %>
 
 <%
     String admin = new Config().getConfig("admin");
@@ -68,7 +71,7 @@
                 <input type="hidden" id="oid" name="oid" value="<% out.print(oid); %>" />
                 <fieldset>
                     <legend>Learning Object Editor</legend>
-// TODO: provide link to view object on index.jsp
+<!-- TODO: provide link to view object on index.jsp -->
                     <div style="float: right">
                         &gt; View all submission <a href="index.jsp">Here</a>
                     </div>
@@ -142,6 +145,14 @@
                                 }
                             %>
                         </div>
+                    </div>
+                    <div>
+                        Submit time: <%
+                            long timestamp = new ObjectId(oid).getTime();
+                            SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+
+                            out.println(df.format(new Date(timestamp)));
+                        %>
                     </div>
                     <div>
                         <button class="button positive">Submit</button>
