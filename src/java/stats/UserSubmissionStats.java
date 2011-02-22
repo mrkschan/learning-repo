@@ -8,6 +8,9 @@ package stats;
 import config.Config;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,6 +59,18 @@ public class UserSubmissionStats extends HttpServlet {
         ESAPI.httpUtilities().setCurrentHTTP(request, response);
         SafeRequest req  = ESAPI.httpUtilities().getCurrentRequest();
         SafeResponse res = ESAPI.httpUtilities().getCurrentResponse();
+
+        DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
+        Date since = null;
+        Date until = null;
+        try {
+            String _since = req.getParameter("since");
+            if (null != _since) since = df.parse(_since);
+
+            String _until = req.getParameter("until");
+            if (null != _until) until = df.parse(_until);
+        } catch (Exception e) {
+        }
 
         // http://poi.apache.org/spreadsheet/how-to.html#user_api
         Workbook wb = new HSSFWorkbook();
@@ -109,8 +124,8 @@ public class UserSubmissionStats extends HttpServlet {
                 }
 
 
-                List<Map<String, Object>> objs = m.queryObject(q);
-                for (int j = 0; j < objs.size(); ++j) {
+                List<Map<String, Object>> objs = m.queryObject(q, since, until);
+                for (int j = 0; null != objs && j < objs.size(); ++j) {
                     Map<String, Object> obj = objs.get(j);
 
                     String permlink = permlink_base + "/edit.jsp" +
