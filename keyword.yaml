@@ -24,6 +24,11 @@
         - Honeypot
         - Anti-IDS
         - Anti-Honeypot
+        - Port Scanning
+        - Vulnerability Discovering/Assessment
+        - Password Cracker
+        - Web Application Attack
+        - Session Hijacking
 -   category: Security Management
     topic:
         - Security Management Methodology/Standard
