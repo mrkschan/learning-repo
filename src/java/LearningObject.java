@@ -56,6 +56,7 @@ public class LearningObject extends HttpServlet {
 
         // backward compatibility
         if (null == theme) theme = "";
+        if (null == comment) comment = "";
 
         // replace \r\n to \n, .replace may cause overflow
         {
